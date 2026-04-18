@@ -70,11 +70,26 @@ npm run android
 
 Admin account: `admin@aiagents.dev` / `Admin@123`
 
+### Docker
+
+Build and run the application in Docker (production static web build served via nginx on port 8080):
+
+```bash
+# Build the image
+docker build -t aiagentsols .
+
+# Run the container
+docker run -p 8080:8080 aiagentsols
+```
+
+Access the app at **http://localhost:8080**
+
 ## Tech Stack
 
 - [Expo](https://expo.dev) ~51 — Universal React Native platform
 - [React Navigation](https://reactnavigation.org) v6 — Stack navigation
 - [TypeScript](https://www.typescriptlang.org) — Type safety
 - React Native Web — Web browser support
+- **Docker** — Multi-stage build with Node 20 → static export → nginx 1.26
 
 This repository contains all the Generative AI Applications 

@@ -1,15 +1,12 @@
 # ─── Stage 1: Build ───────────────────────────────────────────────────────────
 FROM node:20-alpine AS builder
 
-# Install system dependencies needed by some native modules
-RUN apk add --no-cache python3 make g++
-
 WORKDIR /app
 
 # Copy dependency manifests first for layer caching
 COPY package.json package-lock.json ./
 
-# Install all dependencies (including devDependencies needed for build)
+# Install dependencies
 RUN npm ci
 
 # Copy the rest of the source
