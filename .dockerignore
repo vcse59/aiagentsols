@@ -1,0 +1,15 @@
+# Node
+node_modules
+npm-debug.log*
+
+# Expo
+.expo
+dist
+web-build
+
+# Environment
+.env*
+
+# OS
+.DS_Store
+Thumbs.db
