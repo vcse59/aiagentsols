@@ -47,6 +47,8 @@ async function ensureStore() {
   try {
     await fs.mkdir(STORAGE_ROOT, { recursive: true });
     await fs.mkdir(MARKDOWN_DIR, { recursive: true });
+    await fs.chmod(STORAGE_ROOT, 0o755);
+    await fs.chmod(MARKDOWN_DIR, 0o755);
     await verifyWritableDirectory(STORAGE_ROOT);
     await verifyWritableDirectory(MARKDOWN_DIR);
 

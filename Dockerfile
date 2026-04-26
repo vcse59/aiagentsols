@@ -20,7 +20,7 @@ FROM node:20-alpine AS runner
 
 WORKDIR /app
 
-ENV ARTICLE_STORAGE_DIR=/tmp/aiagentsols-content
+ENV ARTICLE_STORAGE_DIR=/data
 
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev && npm cache clean --force
@@ -28,8 +28,9 @@ RUN npm ci --omit=dev && npm cache clean --force
 COPY --chown=node:node server ./server
 COPY --chown=node:node --from=builder /app/dist ./dist
 
-RUN mkdir -p /tmp/aiagentsols-content/markdown \
-	&& chown -R node:node /tmp/aiagentsols-content /app/server /app/dist
+RUN mkdir -p /data/markdown \
+	&& chown -R node:node /data /app/server /app/dist \
+	&& chmod -R 755 /data
 
 USER node
 
