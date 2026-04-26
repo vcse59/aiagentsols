@@ -16,17 +16,23 @@ COPY . .
 RUN npx expo export --platform web
 
 # ─── Stage 2: Serve ───────────────────────────────────────────────────────────
-FROM nginx:1.26-alpine AS runner
+FROM node:20-alpine AS runner
 
-# Remove default nginx config
-RUN rm /etc/nginx/conf.d/default.conf
+WORKDIR /app
 
-# Copy our nginx config
-COPY nginx.conf /etc/nginx/conf.d/app.conf
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev && npm cache clean --force
 
-# Copy the static build from builder
-COPY --from=builder /app/dist /usr/share/nginx/html
+COPY --chown=node:node server ./server
+COPY --chown=node:node --from=builder /app/dist ./dist
+
+RUN mkdir -p /app/content/managed/markdown && chown -R node:node /app
+
+USER node
 
 EXPOSE 8080
 
-CMD ["nginx", "-g", "daemon off;"]
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+	CMD wget -q -O /dev/null http://127.0.0.1:8080/healthz || exit 1
+
+CMD ["node", "server/index.js"]

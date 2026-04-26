@@ -1,5 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
+  ActivityIndicator,
   View,
   Text,
   FlatList,
@@ -10,21 +11,60 @@ import {
   ScrollView,
   Platform,
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useAuth } from '../context/AuthContext';
-import { ARTICLES, CATEGORIES, Article } from '../data/articles';
+import { ARTICLES, CATEGORIES } from '../data/articles';
 import ArticleCard from '../components/ArticleCard';
+import { getPublishedManagedArticles } from '../lib/api';
 import { RootStackParamList } from '../types/navigation';
+import type { DisplayArticle } from '../types/articles';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Articles'>;
 
 export default function ArticlesScreen({ navigation }: Props) {
-  const { user, signOut } = useAuth();
+  const { admin, isInitializing, signOut } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [managedArticles, setManagedArticles] = useState<DisplayArticle[]>([]);
+  const [isLoadingManaged, setIsLoadingManaged] = useState(true);
+  const [loadError, setLoadError] = useState('');
 
-  const filteredArticles = useMemo<Article[]>(() => {
-    return ARTICLES.filter((article) => {
+  const seedArticles = useMemo<DisplayArticle[]>(
+    () => ARTICLES.map((article) => ({ ...article, source: 'seed' })),
+    []
+  );
+
+  const refreshArticles = useCallback(async () => {
+    setIsLoadingManaged(true);
+    try {
+      const response = await getPublishedManagedArticles();
+      setManagedArticles(
+        response.articles.map((article) => ({
+          ...article,
+          source: 'managed',
+        }))
+      );
+      setLoadError('');
+    } catch (error) {
+      setLoadError(
+        error instanceof Error ? error.message : 'Unable to load published admin articles.'
+      );
+    } finally {
+      setIsLoadingManaged(false);
+    }
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      void refreshArticles();
+    }, [refreshArticles])
+  );
+
+  const allArticles = useMemo(() => [...managedArticles, ...seedArticles], [managedArticles, seedArticles]);
+
+  const filteredArticles = useMemo<DisplayArticle[]>(() => {
+    return allArticles.filter((article) => {
       const matchesCategory =
         selectedCategory === 'All' || article.category === selectedCategory;
 
@@ -38,10 +78,10 @@ export default function ArticlesScreen({ navigation }: Props) {
 
       return matchesCategory && matchesSearch;
     });
-  }, [searchQuery, selectedCategory]);
+  }, [allArticles, searchQuery, selectedCategory]);
 
-  const handleArticlePress = (articleId: string) => {
-    navigation.navigate('ArticleDetail', { articleId });
+  const handleArticlePress = (article: DisplayArticle) => {
+    navigation.navigate('ArticleDetail', { article });
   };
 
   return (
@@ -49,13 +89,48 @@ export default function ArticlesScreen({ navigation }: Props) {
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <Text style={styles.headerGreeting}>Hello, {user?.name?.split(' ')[0]} 👋</Text>
-          <Text style={styles.headerTitle}>Generative AI Articles</Text>
+          <Text style={styles.headerGreeting}>
+            {admin ? `Signed in as ${admin.email}` : 'Open access for readers'}
+          </Text>
+          <Text style={styles.headerTitle}>Generative AI Knowledge Hub</Text>
         </View>
-        <TouchableOpacity style={styles.signOutButton} onPress={signOut} activeOpacity={0.8}>
-          <Text style={styles.signOutText}>Sign Out</Text>
-        </TouchableOpacity>
+        <View style={styles.headerActions}>
+          {admin ? (
+            <>
+              <TouchableOpacity
+                style={styles.manageButton}
+                onPress={() => navigation.navigate('AdminEditor')}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.manageButtonText}>Manage Articles</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.signOutButton}
+                onPress={() => {
+                  void signOut();
+                }}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.signOutText}>Sign Out</Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <TouchableOpacity
+              style={styles.manageButton}
+              onPress={() => navigation.navigate('AdminLogin')}
+              activeOpacity={0.85}
+            >
+              <Text style={styles.manageButtonText}>Admin Login</Text>
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
+
+      {loadError ? (
+        <View style={styles.bannerWarning}>
+          <Text style={styles.bannerWarningText}>{loadError}</Text>
+        </View>
+      ) : null}
 
       {/* Search Bar */}
       <View style={styles.searchContainer}>
@@ -117,10 +192,18 @@ export default function ArticlesScreen({ navigation }: Props) {
         data={filteredArticles}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <ArticleCard article={item} onPress={() => handleArticlePress(item.id)} />
+          <ArticleCard article={item} onPress={() => handleArticlePress(item)} />
         )}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
+        ListHeaderComponent={
+          isLoadingManaged && !isInitializing ? (
+            <View style={styles.loadingRow}>
+              <ActivityIndicator color="#0F766E" />
+              <Text style={styles.loadingText}>Loading published admin articles...</Text>
+            </View>
+          ) : null
+        }
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <Text style={styles.emptyEmoji}>🔍</Text>
@@ -144,14 +227,15 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     paddingHorizontal: 20,
     paddingTop: 16,
     paddingBottom: 12,
-    backgroundColor: '#6C63FF',
+    backgroundColor: '#16324F',
   },
   headerLeft: {
     flex: 1,
+    paddingRight: 16,
   },
   headerGreeting: {
     fontSize: 13,
@@ -163,6 +247,23 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#FFFFFF',
   },
+  headerActions: {
+    flexDirection: 'row',
+    gap: 8,
+    flexWrap: 'wrap',
+    justifyContent: 'flex-end',
+  },
+  manageButton: {
+    backgroundColor: '#F0FDF9',
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 7,
+  },
+  manageButtonText: {
+    color: '#0F766E',
+    fontSize: 13,
+    fontWeight: '700',
+  },
   signOutButton: {
     backgroundColor: 'rgba(255,255,255,0.2)',
     borderRadius: 20,
@@ -173,6 +274,16 @@ const styles = StyleSheet.create({
   },
   signOutText: {
     color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  bannerWarning: {
+    backgroundColor: '#FEF3C7',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+  },
+  bannerWarningText: {
+    color: '#92400E',
     fontSize: 13,
     fontWeight: '600',
   },
@@ -244,6 +355,18 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#9CA3AF',
     fontWeight: '500',
+  },
+  loadingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingHorizontal: 8,
+    paddingBottom: 10,
+  },
+  loadingText: {
+    color: '#5C6C7C',
+    fontSize: 13,
+    fontWeight: '600',
   },
   listContent: {
     paddingHorizontal: 16,

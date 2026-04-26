@@ -1,75 +1,99 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
-
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  avatar?: string;
-}
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  ReactNode,
+} from 'react';
+import { getAdminSession, loginAdmin, logoutAdmin } from '../lib/api';
+import type { AdminUser } from '../types/articles';
 
 interface AuthContextType {
-  user: User | null;
+  admin: AdminUser | null;
+  isConfigured: boolean;
+  isInitializing: boolean;
   isLoading: boolean;
   signIn: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  signOut: () => void;
+  signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-// Mock user credentials for demonstration
-const MOCK_USERS: Array<{ email: string; password: string; user: User }> = [
-  {
-    email: 'admin@aiagents.dev',
-    password: 'Admin@123',
-    user: { id: '1', name: 'Admin User', email: 'admin@aiagents.dev' },
-  },
-  {
-    email: 'demo@aiagents.dev',
-    password: 'Demo@123',
-    user: { id: '2', name: 'Demo User', email: 'demo@aiagents.dev' },
-  },
-];
 
 interface AuthProviderProps {
   children: ReactNode;
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<User | null>(null);
+  const [admin, setAdmin] = useState<AdminUser | null>(null);
+  const [isConfigured, setIsConfigured] = useState(true);
+  const [isInitializing, setIsInitializing] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
-  const signIn = useCallback(
-    async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
-      setIsLoading(true);
-      // Simulate network delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+  useEffect(() => {
+    let isMounted = true;
 
-      const trimmedEmail = email.trim().toLowerCase();
-      const match = MOCK_USERS.find(
-        (u) => u.email.toLowerCase() === trimmedEmail && u.password === password
-      );
+    const restoreSession = async () => {
+      try {
+        const session = await getAdminSession();
+        if (!isMounted) {
+          return;
+        }
 
-      setIsLoading(false);
-
-      if (match) {
-        setUser(match.user);
-        return { success: true };
+        setIsConfigured(session.configured);
+        setAdmin(session.authenticated ? session.admin ?? null : null);
+      } catch {
+        if (isMounted) {
+          setAdmin(null);
+        }
+      } finally {
+        if (isMounted) {
+          setIsInitializing(false);
+        }
       }
+    };
 
-      return { success: false, error: 'Invalid email or password. Please try again.' };
+    void restoreSession();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const signIn = useCallback(
+    async (email: string, password: string) => {
+      setIsLoading(true);
+      try {
+        const response = await loginAdmin(email, password);
+        setAdmin(response.admin);
+        return { success: true };
+      } catch (error) {
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unable to sign in.',
+        };
+      } finally {
+        setIsLoading(false);
+      }
     },
     []
   );
 
-  const signOut = useCallback(() => {
-    setUser(null);
+  const signOut = useCallback(async () => {
+    try {
+      await logoutAdmin();
+    } finally {
+      setAdmin(null);
+    }
   }, []);
 
-  return (
-    <AuthContext.Provider value={{ user, isLoading, signIn, signOut }}>
-      {children}
-    </AuthContext.Provider>
+  const value = useMemo(
+    () => ({ admin, isConfigured, isInitializing, isLoading, signIn, signOut }),
+    [admin, isConfigured, isInitializing, isLoading, signIn, signOut]
   );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth(): AuthContextType {

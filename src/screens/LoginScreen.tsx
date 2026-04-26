@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -9,16 +9,25 @@ import {
   Platform,
   ActivityIndicator,
   ScrollView,
-  Alert,
 } from 'react-native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useAuth } from '../context/AuthContext';
+import { RootStackParamList } from '../types/navigation';
 
-export default function LoginScreen() {
-  const { signIn, isLoading } = useAuth();
+type Props = NativeStackScreenProps<RootStackParamList, 'AdminLogin'>;
+
+export default function LoginScreen({ navigation }: Props) {
+  const { admin, isConfigured, isInitializing, signIn, isLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!isInitializing && admin) {
+      navigation.replace('AdminEditor');
+    }
+  }, [admin, isInitializing, navigation]);
 
   const handleSignIn = async () => {
     setError('');
@@ -59,8 +68,16 @@ export default function LoginScreen() {
 
         {/* Card */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Sign In</Text>
-          <Text style={styles.cardSubtitle}>Welcome back! Please sign in to continue.</Text>
+          <Text style={styles.cardTitle}>Admin Login</Text>
+          <Text style={styles.cardSubtitle}>Only the configured administrator can sign in and manage article publishing.</Text>
+
+          {!isConfigured ? (
+            <View style={styles.infoContainer}>
+              <Text style={styles.infoText}>
+                This server does not have `ADMIN_EMAIL`, `ADMIN_PASSWORD`, and `SESSION_SECRET` configured yet.
+              </Text>
+            </View>
+          ) : null}
 
           {/* Error Message */}
           {error ? (
@@ -74,7 +91,7 @@ export default function LoginScreen() {
             <Text style={styles.inputLabel}>Email Address</Text>
             <TextInput
               style={styles.input}
-              placeholder="you@example.com"
+              placeholder="admin@yourdomain.com"
               placeholderTextColor="#9CA3AF"
               value={email}
               onChangeText={setEmail}
@@ -91,7 +108,7 @@ export default function LoginScreen() {
             <View style={styles.passwordContainer}>
               <TextInput
                 style={styles.passwordInput}
-                placeholder="Enter your password"
+                placeholder="Admin password"
                 placeholderTextColor="#9CA3AF"
                 value={password}
                 onChangeText={setPassword}
@@ -113,28 +130,23 @@ export default function LoginScreen() {
           <TouchableOpacity
             style={[styles.signInButton, isLoading && styles.signInButtonDisabled]}
             onPress={handleSignIn}
-            disabled={isLoading}
+            disabled={isLoading || !isConfigured}
             activeOpacity={0.85}
           >
             {isLoading ? (
               <ActivityIndicator color="#FFFFFF" size="small" />
             ) : (
-              <Text style={styles.signInButtonText}>Sign In</Text>
+              <Text style={styles.signInButtonText}>Continue to Admin</Text>
             )}
           </TouchableOpacity>
 
-          {/* Demo Credentials */}
-          <View style={styles.demoContainer}>
-            <Text style={styles.demoTitle}>Demo Credentials</Text>
-            <View style={styles.demoRow}>
-              <Text style={styles.demoLabel}>Email:</Text>
-              <Text style={styles.demoValue}>demo@aiagents.dev</Text>
-            </View>
-            <View style={styles.demoRow}>
-              <Text style={styles.demoLabel}>Password:</Text>
-              <Text style={styles.demoValue}>Demo@123</Text>
-            </View>
-          </View>
+          <TouchableOpacity
+            style={styles.backLink}
+            onPress={() => navigation.navigate('Articles')}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.backLinkText}>Back to public articles</Text>
+          </TouchableOpacity>
         </View>
 
         <Text style={styles.footer}>© 2026 AI Agents Solutions. All rights reserved.</Text>
@@ -202,6 +214,19 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#6B7280',
     marginBottom: 24,
+  },
+  infoContainer: {
+    backgroundColor: '#EFF6FF',
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: '#3B82F6',
+  },
+  infoText: {
+    color: '#1D4ED8',
+    fontSize: 13,
+    lineHeight: 18,
   },
   errorContainer: {
     backgroundColor: '#FEF2F2',
@@ -277,35 +302,14 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 0.5,
   },
-  demoContainer: {
-    marginTop: 24,
-    padding: 14,
-    backgroundColor: '#F0EDFF',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#D8D4FF',
+  backLink: {
+    marginTop: 18,
+    alignSelf: 'center',
   },
-  demoTitle: {
-    fontSize: 12,
-    fontWeight: '700',
+  backLinkText: {
     color: '#6C63FF',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: 8,
-  },
-  demoRow: {
-    flexDirection: 'row',
-    marginBottom: 4,
-  },
-  demoLabel: {
-    fontSize: 13,
-    color: '#6B7280',
-    width: 75,
-  },
-  demoValue: {
-    fontSize: 13,
-    color: '#374151',
-    fontWeight: '500',
+    fontSize: 14,
+    fontWeight: '700',
   },
   footer: {
     textAlign: 'center',

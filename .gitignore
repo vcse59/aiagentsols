@@ -52,6 +52,9 @@ desktop.ini
 # Docker
 docker-compose.override.yml
 
+# Runtime content
+content/managed/
+
 # Legacy (Sencha Ext JS artifacts)
 .architect
 bootstrap.css

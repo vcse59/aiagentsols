@@ -1,5 +1,8 @@
+import type { DisplayArticle } from './articles';
+
 export type RootStackParamList = {
-  Login: undefined;
   Articles: undefined;
-  ArticleDetail: { articleId: string };
+  ArticleDetail: { article: DisplayArticle };
+  AdminLogin: undefined;
+  AdminEditor: undefined;
 };

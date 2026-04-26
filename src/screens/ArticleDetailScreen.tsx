@@ -9,7 +9,6 @@ import {
   Platform,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { ARTICLES } from '../data/articles';
 import { RootStackParamList } from '../types/navigation';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ArticleDetail'>;
@@ -24,8 +23,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 };
 
 export default function ArticleDetailScreen({ route, navigation }: Props) {
-  const { articleId } = route.params;
-  const article = ARTICLES.find((a) => a.id === articleId);
+  const { article } = route.params;
 
   if (!article) {
     return (
