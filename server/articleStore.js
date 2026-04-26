@@ -7,10 +7,18 @@ const matter = require('gray-matter');
 const { z } = require('zod');
 
 const CATEGORIES = ['LLMs', 'Image AI', 'Agents', 'Techniques', 'Ethics', 'Tools'];
-const STORAGE_ROOT =
+
+// Primary storage root — can be overridden via ARTICLE_STORAGE_DIR.
+// Falls back to a temp directory if the configured path is not writable
+// (e.g. when a Railway volume is mounted but owned by root).
+const CONFIGURED_STORAGE_ROOT =
   process.env.ARTICLE_STORAGE_DIR?.trim() || path.join(os.tmpdir(), 'aiagentsols-content');
-const INDEX_FILE = path.join(STORAGE_ROOT, 'articles.json');
-const MARKDOWN_DIR = path.join(STORAGE_ROOT, 'markdown');
+const FALLBACK_STORAGE_ROOT = path.join(os.tmpdir(), 'aiagentsols-content');
+
+// These are resolved lazily inside ensureStore() once we know which root is usable.
+let STORAGE_ROOT = CONFIGURED_STORAGE_ROOT;
+let INDEX_FILE = path.join(STORAGE_ROOT, 'articles.json');
+let MARKDOWN_DIR = path.join(STORAGE_ROOT, 'markdown');
 
 const articleSchema = z.object({
   title: z.string().trim().min(3).max(140),
@@ -32,36 +40,76 @@ function getStoragePaths() {
   };
 }
 
-async function verifyWritableDirectory(dirPath) {
+/**
+ * Attempt to create a directory and verify it is writable by the current
+ * process user.  Returns true on success, false on any permission error.
+ */
+async function tryInitDirectory(rootDir) {
+  const markdownDir = path.join(rootDir, 'markdown');
   try {
-    await fs.access(dirPath, fsSync.constants.W_OK);
-  } catch (error) {
-    throw new Error(
-      `Article storage path is not writable: ${dirPath}. ` +
-        `Ensure the runtime user has write permission. Original error: ${error.message}`
-    );
+    await fs.mkdir(rootDir, { recursive: true });
+    await fs.mkdir(markdownDir, { recursive: true });
+
+    // chmod may fail when the directory is owned by a different user (e.g.
+    // root-owned volume mount).  Treat that as a non-fatal hint and fall
+    // through to the write-access check below.
+    try {
+      await fs.chmod(rootDir, 0o755);
+      await fs.chmod(markdownDir, 0o755);
+    } catch {
+      // ignore — we will confirm writability with the access check
+    }
+
+    // Confirm the process can actually write here.
+    await fs.access(rootDir, fsSync.constants.W_OK);
+    await fs.access(markdownDir, fsSync.constants.W_OK);
+    return true;
+  } catch {
+    return false;
   }
 }
 
 async function ensureStore() {
-  try {
-    await fs.mkdir(STORAGE_ROOT, { recursive: true });
-    await fs.mkdir(MARKDOWN_DIR, { recursive: true });
-    await fs.chmod(STORAGE_ROOT, 0o755);
-    await fs.chmod(MARKDOWN_DIR, 0o755);
-    await verifyWritableDirectory(STORAGE_ROOT);
-    await verifyWritableDirectory(MARKDOWN_DIR);
+  // ── 1. Try the configured (primary) storage root ──────────────────────────
+  let usable = await tryInitDirectory(CONFIGURED_STORAGE_ROOT);
 
-    try {
-      await fs.access(INDEX_FILE);
-    } catch {
-      await writeIndex([]);
-    }
-  } catch (error) {
-    throw new Error(
-      `Failed to initialize article storage under ${STORAGE_ROOT}. ` +
-        `Set ARTICLE_STORAGE_DIR to a writable location. Original error: ${error.message}`
+  if (usable) {
+    STORAGE_ROOT = CONFIGURED_STORAGE_ROOT;
+    console.log(`[articleStore] Using configured storage root: ${CONFIGURED_STORAGE_ROOT}`);
+  } else {
+    // ── 2. Fall back to a temp directory the process always owns ─────────────
+    console.warn(
+      `[articleStore] Cannot write to configured storage root "${CONFIGURED_STORAGE_ROOT}" ` +
+        `(EACCES or volume not yet writable). Falling back to "${FALLBACK_STORAGE_ROOT}".`
     );
+    console.warn(
+      `[articleStore] To persist data across restarts, ensure the volume at ` +
+        `"${CONFIGURED_STORAGE_ROOT}" is owned by the runtime user (uid ${process.getuid?.() ?? 'unknown'}).`
+    );
+
+    usable = await tryInitDirectory(FALLBACK_STORAGE_ROOT);
+    if (!usable) {
+      throw new Error(
+        `[articleStore] Failed to initialize article storage. Neither ` +
+          `"${CONFIGURED_STORAGE_ROOT}" nor the fallback "${FALLBACK_STORAGE_ROOT}" are writable. ` +
+          `Set ARTICLE_STORAGE_DIR to a writable location.`
+      );
+    }
+
+    STORAGE_ROOT = FALLBACK_STORAGE_ROOT;
+  }
+
+  // Update the derived paths to match whichever root we settled on.
+  INDEX_FILE = path.join(STORAGE_ROOT, 'articles.json');
+  MARKDOWN_DIR = path.join(STORAGE_ROOT, 'markdown');
+
+  console.log(`[articleStore] Storage ready — root: ${STORAGE_ROOT}`);
+
+  // Seed an empty index if one does not exist yet.
+  try {
+    await fs.access(INDEX_FILE);
+  } catch {
+    await writeIndex([]);
   }
 }
 
