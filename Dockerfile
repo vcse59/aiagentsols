@@ -28,9 +28,11 @@ RUN npm ci --omit=dev && npm cache clean --force
 COPY --chown=node:node server ./server
 COPY --chown=node:node --from=builder /app/dist ./dist
 
-RUN mkdir -p /data/markdown \
-	&& chown -R node:node /data /app/server /app/dist \
-	&& chmod -R 755 /data
+# /data is a Railway volume mount point — it is mounted at runtime and will
+# replace anything created here, so we only set up the app-owned directories.
+# The articleStore.js ensureStore() function handles creating /data/markdown
+# at startup and falls back to a temp directory if the volume isn't writable.
+RUN chown -R node:node /app/server /app/dist
 
 USER node
 
