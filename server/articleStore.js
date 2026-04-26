@@ -1,11 +1,14 @@
 const fs = require('node:fs/promises');
+const fsSync = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const matter = require('gray-matter');
 const { z } = require('zod');
 
 const CATEGORIES = ['LLMs', 'Image AI', 'Agents', 'Techniques', 'Ethics', 'Tools'];
-const STORAGE_ROOT = process.env.ARTICLE_STORAGE_DIR || path.join(process.cwd(), 'content', 'managed');
+const STORAGE_ROOT =
+  process.env.ARTICLE_STORAGE_DIR?.trim() || path.join(os.tmpdir(), 'aiagentsols-content');
 const INDEX_FILE = path.join(STORAGE_ROOT, 'articles.json');
 const MARKDOWN_DIR = path.join(STORAGE_ROOT, 'markdown');
 
@@ -16,17 +19,47 @@ const articleSchema = z.object({
   author: z.string().trim().min(2).max(80),
   category: z.enum(CATEGORIES),
   tags: z.array(z.string().trim().min(1).max(32)).max(12).default([]),
-  emoji: z.string().trim().min(1).max(4).default('📝'),
+  emoji: z.string().trim().min(1).max(4).default('??'),
   readTime: z.string().trim().max(32).optional().default(''),
   status: z.enum(['draft', 'published']).default('draft'),
 });
 
-async function ensureStore() {
-  await fs.mkdir(MARKDOWN_DIR, { recursive: true });
+function getStoragePaths() {
+  return {
+    storageRoot: STORAGE_ROOT,
+    indexFile: INDEX_FILE,
+    markdownDir: MARKDOWN_DIR,
+  };
+}
+
+async function verifyWritableDirectory(dirPath) {
   try {
-    await fs.access(INDEX_FILE);
-  } catch {
-    await writeIndex([]);
+    await fs.access(dirPath, fsSync.constants.W_OK);
+  } catch (error) {
+    throw new Error(
+      `Article storage path is not writable: ${dirPath}. ` +
+        `Ensure the runtime user has write permission. Original error: ${error.message}`
+    );
+  }
+}
+
+async function ensureStore() {
+  try {
+    await fs.mkdir(STORAGE_ROOT, { recursive: true });
+    await fs.mkdir(MARKDOWN_DIR, { recursive: true });
+    await verifyWritableDirectory(STORAGE_ROOT);
+    await verifyWritableDirectory(MARKDOWN_DIR);
+
+    try {
+      await fs.access(INDEX_FILE);
+    } catch {
+      await writeIndex([]);
+    }
+  } catch (error) {
+    throw new Error(
+      `Failed to initialize article storage under ${STORAGE_ROOT}. ` +
+        `Set ARTICLE_STORAGE_DIR to a writable location. Original error: ${error.message}`
+    );
   }
 }
 
@@ -190,7 +223,7 @@ function parseMarkdownUpload(markdownText, fallbackFields = {}) {
     author: fallbackFields.author || frontmatter.author || 'Admin',
     category: fallbackFields.category || frontmatter.category || 'Tools',
     tags: fallbackFields.tags || frontmatter.tags || [],
-    emoji: fallbackFields.emoji || frontmatter.emoji || '📝',
+    emoji: fallbackFields.emoji || frontmatter.emoji || '??',
     readTime: fallbackFields.readTime || frontmatter.readTime,
     status: fallbackFields.status || frontmatter.status || 'draft',
   };
@@ -202,6 +235,8 @@ module.exports = {
   getAdminArticles,
   getArticleById,
   getPublishedArticles,
+  getStoragePaths,
+  initializeStore: ensureStore,
   parseMarkdownUpload,
   updateArticle,
 };

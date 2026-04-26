@@ -21,6 +21,8 @@ const {
   getAdminArticles,
   getArticleById,
   getPublishedArticles,
+  getStoragePaths,
+  initializeStore,
   parseMarkdownUpload,
   updateArticle,
 } = require('./articleStore');
@@ -239,6 +241,17 @@ app.use((error, _req, res, _next) => {
   res.status(500).json({ error: 'Internal server error.' });
 });
 
-app.listen(PORT, () => {
-  console.log(`AI Agents Solutions server listening on port ${PORT}`);
+async function startServer() {
+  await initializeStore();
+  const { storageRoot } = getStoragePaths();
+
+  app.listen(PORT, () => {
+    console.log(`AI Agents Solutions server listening on port ${PORT}`);
+    console.log(`Article storage initialized at ${storageRoot}`);
+  });
+}
+
+startServer().catch((error) => {
+  console.error('Server startup failed:', error.message);
+  process.exit(1);
 });

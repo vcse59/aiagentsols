@@ -68,6 +68,7 @@ npm run web
 
 # In a separate terminal, start the content API and production web server
 npm run export
+npm run init:storage
 npm run serve
 
 # Expo web dev uses http://localhost:19006
@@ -85,6 +86,8 @@ SESSION_SECRET=replace-with-a-long-random-secret
 ARTICLE_STORAGE_DIR=/absolute/path/for/persistent-content
 ```
 
+If `ARTICLE_STORAGE_DIR` is not set, the app defaults to your OS temp directory (for example `/tmp/aiagentsols-content` on Linux).
+
 Optional for local Expo web development:
 
 ```bash
@@ -100,6 +103,14 @@ EXPO_PUBLIC_API_BASE_URL=http://localhost:8080
 5. Choose **Save Draft** or **Publish Article**.
 
 Uploaded or authored admin articles are persisted as markdown files plus metadata under the configured article storage directory.
+
+### Pre-Deploy Storage Initialization
+
+Run this command before startup in containerized environments to verify that the storage path exists and is writable by the runtime user:
+
+```bash
+npm run init:storage
+```
 
 ### Local Admin Defaults
 
@@ -122,7 +133,7 @@ docker run -p 8080:8080 \
     -e ADMIN_EMAIL=admin@yourdomain.com \
     -e ADMIN_PASSWORD=replace-with-a-strong-password \
     -e SESSION_SECRET=replace-with-a-long-random-secret \
-    -e ARTICLE_STORAGE_DIR=/app/content/managed \
+    -e ARTICLE_STORAGE_DIR=/tmp/aiagentsols-content \
     aiagentsols
 ```
 

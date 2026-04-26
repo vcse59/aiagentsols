@@ -7,6 +7,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web --port 19006",
+    "init:storage": "node server/scripts/initStorage.js",
     "check:server": "node --check server/index.js && node --check server/articleStore.js && node --check server/auth.js",
     "serve": "node server/index.js",
     "export": "expo export --platform web",
