@@ -73,6 +73,7 @@ export default function ArticlesScreen({ navigation }: Props) {
         !query ||
         article.title.toLowerCase().includes(query) ||
         article.summary.toLowerCase().includes(query) ||
+        (article.series || '').toLowerCase().includes(query) ||
         article.tags.some((tag) => tag.toLowerCase().includes(query)) ||
         article.author.toLowerCase().includes(query);
 

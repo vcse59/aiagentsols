@@ -9,6 +9,9 @@ export interface Article {
   readTime: string;
   emoji: string;
   tags: string[];
+  canonicalUrl?: string;
+  coverImage?: string;
+  series?: string;
 }
 
 export const CATEGORIES = ['All', 'LLMs', 'Image AI', 'Agents', 'Techniques', 'Ethics', 'Tools'];

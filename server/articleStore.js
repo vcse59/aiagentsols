@@ -29,6 +29,9 @@ const articleSchema = z.object({
   tags: z.array(z.string().trim().min(1).max(32)).max(12).default([]),
   emoji: z.string().trim().min(1).max(4).default('??'),
   readTime: z.string().trim().max(32).optional().default(''),
+  canonicalUrl: z.string().trim().url().optional().or(z.literal('')).default(''),
+  coverImage: z.string().trim().url().optional().or(z.literal('')).default(''),
+  series: z.string().trim().max(80).optional().default(''),
   status: z.enum(['draft', 'published']).default('draft'),
 });
 
@@ -158,6 +161,10 @@ function displayDate(isoDate) {
 }
 
 function normalizeTags(tags) {
+  if (typeof tags === 'string') {
+    return [...new Set(tags.split(',').map((tag) => tag.trim()).filter(Boolean))];
+  }
+
   if (!Array.isArray(tags)) {
     return [];
   }
@@ -192,6 +199,9 @@ function buildRecord(input, existingRecord) {
     tags: parsed.tags,
     emoji: parsed.emoji,
     readTime: parsed.readTime,
+    canonicalUrl: parsed.canonicalUrl,
+    coverImage: parsed.coverImage,
+    series: parsed.series,
     status,
     date: publishedAt ? displayDate(publishedAt) : 'Draft',
     createdAt: existingRecord?.createdAt || now,
@@ -205,10 +215,15 @@ function buildRecord(input, existingRecord) {
 function serializeMarkdown(record) {
   const frontmatter = {
     title: record.title,
+    description: record.summary,
+    published: record.status === 'published',
+    tags: record.tags.join(', '),
+    ...(record.coverImage ? { cover_image: record.coverImage } : {}),
+    ...(record.canonicalUrl ? { canonical_url: record.canonicalUrl } : {}),
+    ...(record.series ? { series: record.series } : {}),
     summary: record.summary,
     author: record.author,
     category: record.category,
-    tags: record.tags,
     emoji: record.emoji,
     readTime: record.readTime,
     status: record.status,
@@ -268,14 +283,25 @@ function parseMarkdownUpload(markdownText, fallbackFields = {}) {
 
   return {
     title: fallbackFields.title || frontmatter.title,
-    summary: fallbackFields.summary || frontmatter.summary,
+    summary: fallbackFields.summary || frontmatter.summary || frontmatter.description,
     content: parsed.content.trim(),
     author: fallbackFields.author || frontmatter.author || 'Admin',
     category: fallbackFields.category || frontmatter.category || 'Tools',
     tags: fallbackFields.tags || frontmatter.tags || [],
     emoji: fallbackFields.emoji || frontmatter.emoji || '??',
     readTime: fallbackFields.readTime || frontmatter.readTime,
-    status: fallbackFields.status || frontmatter.status || 'draft',
+    canonicalUrl: fallbackFields.canonicalUrl || frontmatter.canonical_url || frontmatter.canonicalUrl,
+    coverImage:
+      fallbackFields.coverImage ||
+      frontmatter.cover_image ||
+      frontmatter.coverImage ||
+      frontmatter.main_image ||
+      frontmatter.mainImage,
+    series: fallbackFields.series || frontmatter.series,
+    status:
+      fallbackFields.status ||
+      frontmatter.status ||
+      (frontmatter.published === true ? 'published' : 'draft'),
   };
 }
 

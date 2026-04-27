@@ -7,6 +7,8 @@ import {
   SafeAreaView,
   TouchableOpacity,
   Platform,
+  Image,
+  Linking,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
@@ -141,6 +143,9 @@ export default function ArticleDetailScreen({ route, navigation }: Props) {
           <View style={styles.emojiContainer}>
             <Text style={styles.emoji}>{article.emoji}</Text>
           </View>
+          {article.coverImage ? (
+            <Image source={{ uri: article.coverImage }} style={styles.coverImage} resizeMode="cover" />
+          ) : null}
           <Text style={styles.title}>{article.title}</Text>
           <Text style={styles.summary}>{article.summary}</Text>
 
@@ -158,12 +163,28 @@ export default function ArticleDetailScreen({ route, navigation }: Props) {
 
           {/* Tags */}
           <View style={styles.tagsRow}>
+            {article.series ? (
+              <View style={styles.seriesChip}>
+                <Text style={styles.seriesChipText}>Series: {article.series}</Text>
+              </View>
+            ) : null}
             {article.tags.map((tag) => (
               <View key={tag} style={styles.tag}>
                 <Text style={styles.tagText}>#{tag}</Text>
               </View>
             ))}
           </View>
+
+          {article.canonicalUrl ? (
+            <TouchableOpacity
+              style={styles.canonicalLink}
+              onPress={() => {
+                void Linking.openURL(article.canonicalUrl as string);
+              }}
+            >
+              <Text style={styles.canonicalLinkText}>Canonical URL: {article.canonicalUrl}</Text>
+            </TouchableOpacity>
+          ) : null}
         </View>
 
         {/* Divider */}
@@ -278,6 +299,12 @@ const styles = StyleSheet.create({
   emoji: {
     fontSize: 30,
   },
+  coverImage: {
+    width: '100%',
+    height: 220,
+    borderRadius: 16,
+    marginBottom: 16,
+  },
   title: {
     fontSize: 22,
     fontWeight: '800',
@@ -335,6 +362,25 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#6B7280',
     fontWeight: '500',
+  },
+  seriesChip: {
+    backgroundColor: '#EDE9FE',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  seriesChipText: {
+    fontSize: 12,
+    color: '#5B21B6',
+    fontWeight: '700',
+  },
+  canonicalLink: {
+    marginTop: 12,
+  },
+  canonicalLinkText: {
+    color: '#1D4ED8',
+    fontSize: 13,
+    textDecorationLine: 'underline',
   },
   divider: {
     height: 1,

@@ -39,17 +39,93 @@ const upload = multer({
 const DIST_DIR = path.join(process.cwd(), 'dist');
 const PORT = Number(process.env.PORT || 8080);
 
+const urlField = z.preprocess((value) => {
+  if (typeof value !== 'string') {
+    return undefined;
+  }
+
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : undefined;
+}, z.string().url().optional());
+
 const articleInputSchema = z.object({
   title: z.string().trim().min(3),
   summary: z.string().trim().optional(),
+  description: z.string().trim().optional(),
   content: z.string().trim().min(20),
-  author: z.string().trim().min(2),
-  category: z.enum(['LLMs', 'Image AI', 'Agents', 'Techniques', 'Ethics', 'Tools']),
-  tags: z.array(z.string()).default([]),
+  author: z.string().trim().min(2).default('Admin'),
+  category: z.enum(['LLMs', 'Image AI', 'Agents', 'Techniques', 'Ethics', 'Tools']).default('Tools'),
+  tags: z
+    .union([z.array(z.string()), z.string()])
+    .optional()
+    .transform((value) => {
+      if (!value) {
+        return [];
+      }
+
+      if (Array.isArray(value)) {
+        return value;
+      }
+
+      return value.split(',');
+    }),
   emoji: z.string().trim().optional(),
   readTime: z.string().trim().optional(),
-  status: z.enum(['draft', 'published']),
+  status: z.enum(['draft', 'published']).optional(),
+  published: z.boolean().optional(),
+  canonicalUrl: urlField,
+  coverImage: urlField,
+  mainImage: urlField,
+  series: z.string().trim().max(80).optional(),
 });
+
+const markdownImportSchema = z.object({
+  markdown: z.string().trim().min(20),
+  title: z.string().trim().optional(),
+  summary: z.string().trim().optional(),
+  description: z.string().trim().optional(),
+  author: z.string().trim().optional(),
+  category: z.enum(['LLMs', 'Image AI', 'Agents', 'Techniques', 'Ethics', 'Tools']).optional(),
+  tags: z
+    .union([z.array(z.string()), z.string()])
+    .optional()
+    .transform((value) => {
+      if (!value) {
+        return [];
+      }
+
+      if (Array.isArray(value)) {
+        return value;
+      }
+
+      return value.split(',');
+    }),
+  emoji: z.string().trim().optional(),
+  readTime: z.string().trim().optional(),
+  status: z.enum(['draft', 'published']).optional(),
+  published: z.boolean().optional(),
+  canonicalUrl: urlField,
+  coverImage: urlField,
+  mainImage: urlField,
+  series: z.string().trim().max(80).optional(),
+});
+
+function normalizeArticlePayload(payload) {
+  return {
+    title: payload.title,
+    summary: payload.summary || payload.description || '',
+    content: payload.content,
+    author: payload.author,
+    category: payload.category,
+    tags: payload.tags,
+    emoji: payload.emoji,
+    readTime: payload.readTime,
+    canonicalUrl: payload.canonicalUrl,
+    coverImage: payload.coverImage || payload.mainImage,
+    series: payload.series,
+    status: payload.status || (payload.published ? 'published' : 'draft'),
+  };
+}
 
 app.disable('x-powered-by');
 app.use(
@@ -150,7 +226,7 @@ app.get('/api/admin/articles', requireAdmin, async (_req, res, next) => {
 
 app.post('/api/admin/articles', requireAdmin, async (req, res, next) => {
   try {
-    const payload = articleInputSchema.parse(req.body);
+    const payload = normalizeArticlePayload(articleInputSchema.parse(req.body));
     const article = await createArticle(payload);
     res.status(201).json({ article });
   } catch (error) {
@@ -160,7 +236,7 @@ app.post('/api/admin/articles', requireAdmin, async (req, res, next) => {
 
 app.put('/api/admin/articles/:id', requireAdmin, async (req, res, next) => {
   try {
-    const payload = articleInputSchema.parse(req.body);
+    const payload = normalizeArticlePayload(articleInputSchema.parse(req.body));
     const article = await updateArticle(req.params.id, payload);
     if (!article) {
       return res.status(404).json({ error: 'Article not found.' });
@@ -186,15 +262,45 @@ app.post('/api/admin/articles/upload', requireAdmin, upload.single('file'), asyn
     const payload = parseMarkdownUpload(req.file.buffer.toString('utf8'), {
       title: req.body.title,
       summary: req.body.summary,
+      description: req.body.description,
       author: req.body.author,
       category: req.body.category,
       emoji: req.body.emoji,
       readTime: req.body.readTime,
+      canonicalUrl: req.body.canonicalUrl,
+      coverImage: req.body.coverImage,
+      series: req.body.series,
       status: req.body.status,
       tags,
     });
 
-    const article = await createArticle(articleInputSchema.parse(payload));
+    const article = await createArticle(normalizeArticlePayload(articleInputSchema.parse(payload)));
+    res.status(201).json({ article });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post('/api/admin/articles/import', requireAdmin, async (req, res, next) => {
+  try {
+    const payload = markdownImportSchema.parse(req.body);
+    const parsed = parseMarkdownUpload(payload.markdown, {
+      title: payload.title,
+      summary: payload.summary,
+      description: payload.description,
+      author: payload.author,
+      category: payload.category,
+      tags: payload.tags,
+      emoji: payload.emoji,
+      readTime: payload.readTime,
+      status: payload.status,
+      published: payload.published,
+      canonicalUrl: payload.canonicalUrl,
+      coverImage: payload.coverImage || payload.mainImage,
+      series: payload.series,
+    });
+
+    const article = await createArticle(normalizeArticlePayload(articleInputSchema.parse(parsed)));
     res.status(201).json({ article });
   } catch (error) {
     next(error);

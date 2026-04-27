@@ -14,7 +14,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { CATEGORIES } from '../data/articles';
 import { useAuth } from '../context/AuthContext';
-import { createAdminArticle, getAdminArticles, updateAdminArticle, uploadAdminMarkdown } from '../lib/api';
+import { createAdminArticle, getAdminArticles, importAdminMarkdown, updateAdminArticle, uploadAdminMarkdown } from '../lib/api';
 import { RootStackParamList } from '../types/navigation';
 import type { ArticleInput, DisplayArticle, ManagedArticleStatus } from '../types/articles';
 
@@ -29,6 +29,9 @@ type FormState = {
   tags: string;
   emoji: string;
   readTime: string;
+  canonicalUrl: string;
+  coverImage: string;
+  series: string;
 };
 
 const initialFormState: FormState = {
@@ -40,6 +43,9 @@ const initialFormState: FormState = {
   tags: '',
   emoji: '📝',
   readTime: '',
+  canonicalUrl: '',
+  coverImage: '',
+  series: '',
 };
 
 function toFormState(article?: DisplayArticle): FormState {
@@ -56,6 +62,9 @@ function toFormState(article?: DisplayArticle): FormState {
     tags: article.tags.join(', '),
     emoji: article.emoji,
     readTime: article.readTime,
+    canonicalUrl: article.canonicalUrl || '',
+    coverImage: article.coverImage || '',
+    series: article.series || '',
   };
 }
 
@@ -70,6 +79,9 @@ function toPayload(form: FormState, status: ManagedArticleStatus): ArticleInput 
     emoji: form.emoji.trim() || '📝',
     readTime: form.readTime.trim(),
     status,
+    canonicalUrl: form.canonicalUrl.trim(),
+    coverImage: form.coverImage.trim(),
+    series: form.series.trim(),
   };
 }
 
@@ -82,6 +94,8 @@ export default function AdminEditorScreen({ navigation }: Props) {
   const [successMessage, setSuccessMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
+  const [markdownImportText, setMarkdownImportText] = useState('');
 
   const loadArticles = useCallback(async () => {
     if (!admin) {
@@ -177,6 +191,9 @@ export default function AdminEditorScreen({ navigation }: Props) {
       formData.append('category', form.category);
       formData.append('emoji', form.emoji.trim() || '📝');
       formData.append('tags', form.tags);
+      formData.append('canonicalUrl', form.canonicalUrl.trim());
+      formData.append('coverImage', form.coverImage.trim());
+      formData.append('series', form.series.trim());
 
       setIsUploading(true);
       setError('');
@@ -198,6 +215,42 @@ export default function AdminEditorScreen({ navigation }: Props) {
     picker.click();
   };
 
+  const importMarkdownText = async (status: ManagedArticleStatus) => {
+    if (!markdownImportText.trim()) {
+      setError('Paste markdown content before importing.');
+      return;
+    }
+
+    setIsImporting(true);
+    setError('');
+    setSuccessMessage('');
+
+    try {
+      const response = await importAdminMarkdown({
+        markdown: markdownImportText,
+        status,
+        title: form.title.trim(),
+        summary: form.summary.trim(),
+        author: form.author.trim() || 'Admin',
+        category: form.category,
+        tags: form.tags,
+        emoji: form.emoji.trim() || '📝',
+        readTime: form.readTime.trim(),
+        canonicalUrl: form.canonicalUrl.trim(),
+        coverImage: form.coverImage.trim(),
+        series: form.series.trim(),
+      });
+      setSelectedArticleId(response.article.id);
+      setForm(toFormState(response.article));
+      setSuccessMessage(status === 'published' ? 'Markdown imported and published.' : 'Markdown imported as draft.');
+      await loadArticles();
+    } catch (importError) {
+      setError(importError instanceof Error ? importError.message : 'Unable to import markdown content.');
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
   if (isInitializing) {
     return (
       <SafeAreaView style={styles.centeredState}>
@@ -213,7 +266,7 @@ export default function AdminEditorScreen({ navigation }: Props) {
           <Text style={styles.heroEyebrow}>Admin Workspace</Text>
           <Text style={styles.heroTitle}>Publish markdown articles without leaving the site.</Text>
           <Text style={styles.heroSubtitle}>
-            Upload a `.md` file or write directly in the editor, then save it as a draft or publish it immediately.
+            Write in markdown, preserve Dev.to frontmatter fields, upload `.md` files, and publish in one flow.
           </Text>
           <View style={styles.heroActions}>
             <TouchableOpacity style={styles.secondaryButton} onPress={() => navigation.navigate('Articles')}>
@@ -314,6 +367,42 @@ export default function AdminEditorScreen({ navigation }: Props) {
           <Text style={styles.label}>Tags</Text>
           <TextInput style={styles.input} value={form.tags} onChangeText={(value) => updateField('tags', value)} placeholder="markdown, admin, publishing" />
 
+          <Text style={styles.label}>Series (Dev.to)</Text>
+          <TextInput
+            style={styles.input}
+            value={form.series}
+            onChangeText={(value) => updateField('series', value)}
+            placeholder="Building AI Agents"
+          />
+
+          <Text style={styles.label}>Cover Image URL (Dev.to cover_image)</Text>
+          <TextInput
+            style={styles.input}
+            value={form.coverImage}
+            onChangeText={(value) => updateField('coverImage', value)}
+            placeholder="https://example.com/cover.png"
+            autoCapitalize="none"
+          />
+
+          <Text style={styles.label}>Canonical URL (Dev.to canonical_url)</Text>
+          <TextInput
+            style={styles.input}
+            value={form.canonicalUrl}
+            onChangeText={(value) => updateField('canonicalUrl', value)}
+            placeholder="https://your-site.com/original-post"
+            autoCapitalize="none"
+          />
+
+          <Text style={styles.label}>Paste Markdown (Dev.to frontmatter supported)</Text>
+          <TextInput
+            style={[styles.input, styles.importInput]}
+            multiline
+            textAlignVertical="top"
+            value={markdownImportText}
+            onChangeText={setMarkdownImportText}
+            placeholder="---\ntitle: Your title\ndescription: Summary\npublished: false\ntags: ai, agents\n---\n\n# Article"
+          />
+
           <Text style={styles.label}>Markdown Content</Text>
           <TextInput
             style={[styles.input, styles.markdownInput]}
@@ -325,6 +414,12 @@ export default function AdminEditorScreen({ navigation }: Props) {
           />
 
           <View style={styles.actionGrid}>
+            <TouchableOpacity style={styles.secondaryButton} onPress={() => importMarkdownText('draft')} disabled={isImporting}>
+              <Text style={styles.secondaryButtonText}>{isImporting ? 'Importing...' : 'Import Paste as Draft'}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.secondaryButton} onPress={() => importMarkdownText('published')} disabled={isImporting}>
+              <Text style={styles.secondaryButtonText}>Import Paste and Publish</Text>
+            </TouchableOpacity>
             <TouchableOpacity style={styles.secondaryButton} onPress={() => uploadMarkdown('draft')} disabled={isUploading}>
               <Text style={styles.secondaryButtonText}>{isUploading ? 'Uploading...' : 'Upload as Draft'}</Text>
             </TouchableOpacity>
@@ -520,6 +615,9 @@ const styles = StyleSheet.create({
   },
   markdownInput: {
     minHeight: 240,
+  },
+  importInput: {
+    minHeight: 180,
   },
   categoryRow: {
     gap: 10,

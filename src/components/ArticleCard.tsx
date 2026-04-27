@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { Article } from '../data/articles';
 
 interface ArticleCardProps {
@@ -21,6 +21,10 @@ export default function ArticleCard({ article, onPress }: ArticleCardProps) {
 
   return (
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.88}>
+      {article.coverImage ? (
+        <Image source={{ uri: article.coverImage }} style={styles.coverImage} resizeMode="cover" />
+      ) : null}
+
       {/* Top row: emoji + category badge */}
       <View style={styles.topRow}>
         <View style={styles.emojiContainer}>
@@ -53,6 +57,11 @@ export default function ArticleCard({ article, onPress }: ArticleCardProps) {
 
       {/* Tags */}
       <View style={styles.tagsRow}>
+        {article.series ? (
+          <View style={styles.seriesTag}>
+            <Text style={styles.seriesTagText}>Series: {article.series}</Text>
+          </View>
+        ) : null}
         {article.tags.slice(0, 3).map((tag) => (
           <View key={tag} style={styles.tag}>
             <Text style={styles.tagText}>#{tag}</Text>
@@ -76,6 +85,12 @@ const styles = StyleSheet.create({
     elevation: 3,
     borderWidth: 1,
     borderColor: '#F3F4F6',
+  },
+  coverImage: {
+    width: '100%',
+    height: 160,
+    borderRadius: 12,
+    marginBottom: 14,
   },
   topRow: {
     flexDirection: 'row',
@@ -151,6 +166,17 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 8,
     paddingVertical: 3,
+  },
+  seriesTag: {
+    backgroundColor: '#EEF2FF',
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  seriesTagText: {
+    fontSize: 11,
+    color: '#4338CA',
+    fontWeight: '600',
   },
   tagText: {
     fontSize: 11,

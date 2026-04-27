@@ -8,6 +8,8 @@ A production-oriented Expo web application with a built-in Node.js content API. 
 - **Admin-Only Login** — Only the configured administrator can sign in
 - **Markdown Authoring** — Write new articles directly in markdown
 - **Markdown Upload** — Upload `.md` files and save as draft or publish immediately
+- **Paste Markdown Import** — Paste raw markdown/frontmatter and import as draft or published
+- **Dev.to-Compatible Frontmatter** — Supports `description`, `published`, `cover_image`, `canonical_url`, and `series`
 - **Draft and Publish Workflow** — Manage unpublished drafts before release
 - **Search and Filtering** — Full-text search and category filters for public readers
 - **Responsive UI** — Optimized for web with Expo and React Native Web

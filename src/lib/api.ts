@@ -1,4 +1,4 @@
-import type { AdminUser, ArticleInput, DisplayArticle } from '../types/articles';
+import type { AdminUser, ArticleInput, DisplayArticle, ManagedArticleStatus } from '../types/articles';
 
 const isWeb = typeof window !== 'undefined';
 const isExpoWebDev = isWeb && window.location.port === '19006';
@@ -74,5 +74,27 @@ export function uploadAdminMarkdown(formData: FormData) {
   return request<{ article: DisplayArticle }>('/api/admin/articles/upload', {
     method: 'POST',
     body: formData,
+  });
+}
+
+interface MarkdownImportPayload {
+  markdown: string;
+  status: ManagedArticleStatus;
+  title?: string;
+  summary?: string;
+  author?: string;
+  category?: string;
+  tags?: string;
+  emoji?: string;
+  readTime?: string;
+  canonicalUrl?: string;
+  coverImage?: string;
+  series?: string;
+}
+
+export function importAdminMarkdown(payload: MarkdownImportPayload) {
+  return request<{ article: DisplayArticle }>('/api/admin/articles/import', {
+    method: 'POST',
+    body: JSON.stringify(payload),
   });
 }
