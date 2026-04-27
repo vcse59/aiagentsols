@@ -27,18 +27,15 @@ RUN npm ci --omit=dev && npm cache clean --force
 
 COPY --chown=node:node server ./server
 COPY --chown=node:node --from=builder /app/dist ./dist
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
-# /data is a Railway volume mount point — it is mounted at runtime and will
-# replace anything created here, so we only set up the app-owned directories.
-# The articleStore.js ensureStore() function handles creating /data/markdown
-# at startup and falls back to a temp directory if the volume isn't writable.
-RUN chown -R node:node /app/server /app/dist
-
-USER node
+RUN apk add --no-cache su-exec \
+	&& chmod +x /usr/local/bin/docker-entrypoint.sh \
+	&& chown -R node:node /app/server /app/dist
 
 EXPOSE 8080
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
 	CMD wget -q -O /dev/null http://127.0.0.1:8080/healthz || exit 1
 
-CMD ["node", "server/index.js"]
+ENTRYPOINT ["docker-entrypoint.sh"]
