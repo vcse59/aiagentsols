@@ -1,68 +1,54 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { Article } from '../data/articles';
+import { Colors, Typography, Spacing, Radius, Shadow } from '../theme';
 
 interface ArticleCardProps {
   article: Article;
   onPress: () => void;
 }
 
-const CATEGORY_COLORS: Record<string, string> = {
-  LLMs: '#6C63FF',
-  'Image AI': '#F59E0B',
-  Agents: '#10B981',
-  Techniques: '#3B82F6',
-  Ethics: '#EF4444',
-  Tools: '#8B5CF6',
-};
-
 export default function ArticleCard({ article, onPress }: ArticleCardProps) {
-  const categoryColor = CATEGORY_COLORS[article.category] ?? '#6C63FF';
+  const categoryColor = Colors.categories[article.category] ?? Colors.primary;
 
   return (
     <TouchableOpacity
-      style={[styles.card, { borderTopColor: categoryColor }]}
+      style={[styles.card, { borderLeftColor: categoryColor }]}
       onPress={onPress}
-      activeOpacity={0.85}
+      activeOpacity={0.82}
     >
       {article.coverImage ? (
         <Image source={{ uri: article.coverImage }} style={styles.coverImage} resizeMode="cover" />
       ) : null}
 
-      {/* Top row: emoji + category badge + arrow */}
+      {/* Top row */}
       <View style={styles.topRow}>
-        <View style={[styles.emojiContainer, { backgroundColor: `${categoryColor}15` }]}>
+        <View style={[styles.emojiWrap, { backgroundColor: `${categoryColor}18` }]}>
           <Text style={styles.emoji}>{article.emoji}</Text>
         </View>
         <View style={styles.topRowRight}>
-          <View style={[styles.categoryBadge, { backgroundColor: `${categoryColor}12`, borderColor: `${categoryColor}30` }]}>
+          <View style={[styles.categoryPill, { backgroundColor: `${categoryColor}14`, borderColor: `${categoryColor}38` }]}>
             <Text style={[styles.categoryText, { color: categoryColor }]}>{article.category}</Text>
           </View>
-          <View style={[styles.arrowCircle, { backgroundColor: `${categoryColor}10` }]}>
-            <Text style={[styles.arrow, { color: categoryColor }]}>›</Text>
+          <View style={[styles.arrowWrap, { backgroundColor: `${categoryColor}12` }]}>
+            <Text style={[styles.arrowIcon, { color: categoryColor }]}>›</Text>
           </View>
         </View>
       </View>
 
       {/* Title */}
-      <Text style={styles.title} numberOfLines={2}>
-        {article.title}
-      </Text>
+      <Text style={styles.title} numberOfLines={2}>{article.title}</Text>
 
       {/* Summary */}
-      <Text style={styles.summary} numberOfLines={3}>
-        {article.summary}
-      </Text>
+      <Text style={styles.summary} numberOfLines={3}>{article.summary}</Text>
 
       {/* Footer */}
       <View style={styles.footer}>
-        <View style={styles.authorChip}>
-          <Text style={styles.author}>{article.author}</Text>
-        </View>
-        <View style={styles.metaRight}>
-          <Text style={styles.meta}>⏱ {article.readTime}</Text>
-          <Text style={styles.metaDot}>·</Text>
-          <Text style={styles.meta}>{article.date}</Text>
+        <Text style={styles.author} numberOfLines={1}>{article.author}</Text>
+        <View style={styles.metaGroup}>
+          <Text style={styles.metaText}>⏱ {article.readTime}</Text>
+          <View style={styles.metaDot} />
+          <Text style={styles.metaText}>{article.date}</Text>
         </View>
       </View>
 
@@ -87,135 +73,118 @@ export default function ArticleCard({ article, onPress }: ArticleCardProps) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 14,
-    shadowColor: '#1E293B',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 16,
-    elevation: 4,
-    borderTopWidth: 3,
-    borderLeftWidth: 1,
-    borderRightWidth: 1,
-    borderBottomWidth: 1,
-    borderLeftColor: '#F1F5F9',
-    borderRightColor: '#F1F5F9',
-    borderBottomColor: '#F1F5F9',
+    backgroundColor: Colors.surface,
+    borderRadius: Radius['2xl'],
+    padding: Spacing.xl,
+    marginBottom: Spacing.md,
+    borderLeftWidth: 4,
+    borderTopWidth: 0.5,
+    borderRightWidth: 0.5,
+    borderBottomWidth: 0.5,
+    borderTopColor: Colors.borderLight,
+    borderRightColor: Colors.borderLight,
+    borderBottomColor: Colors.borderLight,
+    ...Shadow.md,
   },
   coverImage: {
     width: '100%',
-    height: 160,
-    borderRadius: 14,
-    marginBottom: 14,
+    height: 164,
+    borderRadius: Radius.lg,
+    marginBottom: Spacing.lg,
   },
   topRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 14,
+    marginBottom: Spacing.md,
   },
   topRowRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: Spacing.sm,
   },
-  emojiContainer: {
-    width: 50,
-    height: 50,
-    borderRadius: 14,
+  emojiWrap: {
+    width: 48,
+    height: 48,
+    borderRadius: Radius.md,
     justifyContent: 'center',
     alignItems: 'center',
   },
   emoji: {
-    fontSize: 24,
-  },
-  arrowCircle: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  arrow: {
     fontSize: 22,
-    fontWeight: '700',
-    lineHeight: 26,
   },
-  categoryBadge: {
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 5,
+  categoryPill: {
+    borderRadius: Radius.full,
+    paddingHorizontal: 11,
+    paddingVertical: 4,
     borderWidth: 1,
   },
   categoryText: {
     fontSize: 12,
     fontWeight: '700',
-    letterSpacing: 0.3,
+    letterSpacing: 0.2,
+  },
+  arrowWrap: {
+    width: 28,
+    height: 28,
+    borderRadius: Radius.full,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  arrowIcon: {
+    fontSize: 22,
+    fontWeight: '700',
+    lineHeight: 26,
   },
   title: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: '#0F172A',
-    lineHeight: 24,
-    marginBottom: 8,
-    letterSpacing: -0.2,
+    ...Typography.h3,
+    color: Colors.textPrimary,
+    marginBottom: Spacing.sm,
   },
   summary: {
-    fontSize: 14,
-    color: '#64748B',
-    lineHeight: 21,
-    marginBottom: 16,
+    ...Typography.bodySm,
+    color: Colors.textMuted,
+    marginBottom: Spacing.lg,
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 14,
-    paddingTop: 14,
+    paddingTop: Spacing.md,
     borderTopWidth: 1,
-    borderTopColor: '#F1F5F9',
-  },
-  authorChip: {
-    flex: 1,
+    borderTopColor: Colors.borderMuted,
+    marginBottom: Spacing.md,
   },
   author: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#475569',
+    ...Typography.labelMd,
+    color: Colors.textSecondary,
+    flex: 1,
   },
-  metaRight: {
+  metaGroup: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  meta: {
-    fontSize: 12,
-    color: '#94A3B8',
+  metaText: {
+    ...Typography.bodyXs,
+    color: Colors.textFaint,
   },
   metaDot: {
-    fontSize: 12,
-    color: '#CBD5E1',
-    marginHorizontal: 4,
+    width: 3,
+    height: 3,
+    borderRadius: 2,
+    backgroundColor: Colors.borderMuted,
+    marginHorizontal: Spacing.sm,
   },
   tagsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 6,
-  },
-  tag: {
-    backgroundColor: '#F8FAFC',
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
+    gap: Spacing.xs,
   },
   seriesTag: {
     backgroundColor: '#EEF2FF',
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    borderRadius: Radius.sm,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: 3,
     borderWidth: 1,
     borderColor: '#C7D2FE',
   },
@@ -224,9 +193,17 @@ const styles = StyleSheet.create({
     color: '#4338CA',
     fontWeight: '700',
   },
+  tag: {
+    backgroundColor: Colors.surfaceDim,
+    borderRadius: Radius.sm,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: 3,
+    borderWidth: 1,
+    borderColor: Colors.borderMuted,
+  },
   tagText: {
     fontSize: 11,
-    color: '#64748B',
+    color: Colors.textMuted,
     fontWeight: '500',
   },
 });

@@ -12,6 +12,7 @@ import {
   Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Colors, Spacing, Radius, Shadow, Typography, GradientPresets } from '../theme';
 import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useAuth } from '../context/AuthContext';
@@ -90,7 +91,7 @@ export default function ArticlesScreen({ navigation }: Props) {
     <SafeAreaView style={styles.safeArea}>
       {/* Header */}
       <LinearGradient
-        colors={['#4F46E5', '#7C3AED']}
+        colors={GradientPresets.brand}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.header}
@@ -98,10 +99,12 @@ export default function ArticlesScreen({ navigation }: Props) {
         <View style={styles.headerTop}>
           <View style={styles.headerLeft}>
             <View style={styles.brandRow}>
-              <Text style={styles.brandIcon}>🤖</Text>
+              <View style={styles.brandIconWrap}>
+                <Text style={styles.brandIcon}>🤖</Text>
+              </View>
               <Text style={styles.brandName}>AI Agents Solutions</Text>
             </View>
-            <Text style={styles.headerTitle}>Generative AI Knowledge Hub</Text>
+            <Text style={styles.headerTitle}>Generative AI{'\n'}Knowledge Hub</Text>
           </View>
           <View style={styles.headerActions}>
             {admin ? (
@@ -115,9 +118,7 @@ export default function ArticlesScreen({ navigation }: Props) {
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.signOutButton}
-                  onPress={() => {
-                    void signOut();
-                  }}
+                  onPress={() => { void signOut(); }}
                   activeOpacity={0.8}
                 >
                   <Text style={styles.signOutText}>Sign Out</Text>
@@ -136,14 +137,14 @@ export default function ArticlesScreen({ navigation }: Props) {
         </View>
         {admin ? (
           <View style={styles.adminBadge}>
-            <Text style={styles.adminBadgeText}>✓ Signed in as {admin.email}</Text>
+            <Text style={styles.adminBadgeText}>✓ {admin.email}</Text>
           </View>
         ) : null}
       </LinearGradient>
 
       {loadError ? (
         <View style={styles.bannerWarning}>
-          <Text style={styles.bannerWarningText}>{loadError}</Text>
+          <Text style={styles.bannerWarningText}>⚠️ {loadError}</Text>
         </View>
       ) : null}
 
@@ -238,13 +239,13 @@ export default function ArticlesScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F0F4FF',
-    paddingTop: Platform.OS === 'android' ? 24 : 0,
+    backgroundColor: Colors.background,
+    paddingTop: Platform.OS === 'android' ? 28 : 0,
   },
   header: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 20,
+    paddingHorizontal: Spacing.xl,
+    paddingTop: Spacing.xl,
+    paddingBottom: Spacing['2xl'],
   },
   headerTop: {
     flexDirection: 'row',
@@ -253,56 +254,60 @@ const styles = StyleSheet.create({
   },
   headerLeft: {
     flex: 1,
-    paddingRight: 12,
+    paddingRight: Spacing.md,
   },
   brandRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    marginBottom: 6,
+    gap: Spacing.sm,
+    marginBottom: Spacing.sm,
+  },
+  brandIconWrap: {
+    width: 28,
+    height: 28,
+    borderRadius: Radius.sm,
+    backgroundColor: Colors.overlayMedium,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   brandIcon: {
-    fontSize: 18,
+    fontSize: 16,
   },
   brandName: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: 'rgba(255,255,255,0.85)',
-    letterSpacing: 0.3,
+    ...Typography.labelMd,
+    color: 'rgba(255,255,255,0.9)',
+    letterSpacing: 0.2,
   },
   headerTitle: {
-    fontSize: 22,
-    fontWeight: '800',
-    color: '#FFFFFF',
-    letterSpacing: -0.3,
-    lineHeight: 28,
+    ...Typography.displayMd,
+    color: Colors.textOnPrimary,
+    lineHeight: 34,
   },
   headerActions: {
-    flexDirection: 'row',
-    gap: 8,
-    flexWrap: 'wrap',
-    justifyContent: 'flex-end',
+    flexDirection: 'column',
+    gap: Spacing.sm,
+    alignItems: 'flex-end',
   },
   manageButton: {
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    backgroundColor: Colors.overlayMedium,
+    borderRadius: Radius.full,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.sm,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.35)',
+    borderColor: 'rgba(255,255,255,0.3)',
   },
   manageButtonText: {
-    color: '#FFFFFF',
+    color: Colors.textOnPrimary,
     fontSize: 13,
     fontWeight: '700',
   },
   signOutButton: {
-    backgroundColor: 'rgba(0,0,0,0.15)',
-    borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    backgroundColor: Colors.overlayDark,
+    borderRadius: Radius.full,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.sm,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)',
+    borderColor: 'rgba(255,255,255,0.18)',
   },
   signOutText: {
     color: 'rgba(255,255,255,0.9)',
@@ -310,12 +315,14 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   adminBadge: {
-    marginTop: 12,
+    marginTop: Spacing.md,
     backgroundColor: 'rgba(255,255,255,0.15)',
-    borderRadius: 20,
-    paddingHorizontal: 12,
+    borderRadius: Radius.full,
+    paddingHorizontal: Spacing.md,
     paddingVertical: 5,
     alignSelf: 'flex-start',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.25)',
   },
   adminBadgeText: {
     color: 'rgba(255,255,255,0.95)',
@@ -323,139 +330,129 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   bannerWarning: {
-    backgroundColor: '#FEF3C7',
-    paddingHorizontal: 16,
+    backgroundColor: Colors.warningBg,
+    paddingHorizontal: Spacing.lg,
     paddingVertical: 10,
     borderLeftWidth: 4,
-    borderLeftColor: '#F59E0B',
+    borderLeftColor: Colors.warning,
   },
   bannerWarningText: {
     color: '#92400E',
-    fontSize: 13,
-    fontWeight: '600',
+    ...Typography.labelMd,
   },
   searchWrapper: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 4,
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.lg,
+    paddingBottom: Spacing.xs,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    paddingHorizontal: 14,
-    paddingVertical: Platform.OS === 'ios' ? 12 : 6,
-    shadowColor: '#4F46E5',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 3,
-    borderWidth: 1,
-    borderColor: '#E8E4FF',
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.xl,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Platform.OS === 'ios' ? 13 : 8,
+    ...Shadow.sm,
+    borderWidth: 1.5,
+    borderColor: Colors.borderDefault,
   },
   searchIcon: {
     fontSize: 16,
-    marginRight: 10,
+    marginRight: Spacing.sm,
   },
   searchInput: {
     flex: 1,
     fontSize: 15,
-    color: '#0F172A',
-    fontWeight: '400',
+    color: Colors.textPrimary,
   },
   clearButton: {
-    paddingLeft: 10,
+    paddingLeft: Spacing.sm,
     paddingRight: 2,
+    width: 28,
+    height: 28,
+    borderRadius: Radius.full,
+    backgroundColor: Colors.borderMuted,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   clearIcon: {
-    fontSize: 14,
-    color: '#94A3B8',
+    fontSize: 13,
+    color: Colors.textMuted,
+    fontWeight: '700',
   },
   categoryWrapper: {
-    marginTop: 14,
+    marginTop: Spacing.md,
   },
   categoryScroll: {
-    paddingHorizontal: 16,
-    gap: 8,
+    paddingHorizontal: Spacing.lg,
+    gap: Spacing.sm,
+    paddingBottom: Spacing.xs,
   },
   categoryChip: {
-    paddingHorizontal: 18,
+    paddingHorizontal: Spacing.lg,
     paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: '#FFFFFF',
+    borderRadius: Radius.full,
+    backgroundColor: Colors.surface,
     borderWidth: 1.5,
-    borderColor: '#DDD8FF',
-    shadowColor: '#4F46E5',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 1,
+    borderColor: Colors.borderDefault,
+    ...Shadow.xs,
   },
   categoryChipActive: {
-    backgroundColor: '#6C63FF',
-    borderColor: '#6C63FF',
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    elevation: 4,
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
+    ...Shadow.sm,
   },
   categoryChipText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#6C63FF',
+    color: Colors.primary,
   },
   categoryChipTextActive: {
-    color: '#FFFFFF',
+    color: Colors.textOnPrimary,
   },
   resultBar: {
-    paddingHorizontal: 20,
-    paddingTop: 14,
-    paddingBottom: 6,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    paddingHorizontal: Spacing.xl,
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.xs,
   },
   resultText: {
-    fontSize: 13,
-    color: '#64748B',
-    fontWeight: '600',
+    ...Typography.labelMd,
+    color: Colors.textMuted,
   },
   loadingRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    paddingHorizontal: 8,
-    paddingBottom: 10,
+    gap: Spacing.sm,
+    paddingHorizontal: Spacing.sm,
+    paddingBottom: Spacing.sm,
   },
   loadingText: {
-    color: '#64748B',
-    fontSize: 13,
-    fontWeight: '600',
+    ...Typography.labelMd,
+    color: Colors.textMuted,
   },
   listContent: {
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 40,
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.sm,
+    paddingBottom: 48,
   },
   emptyState: {
     alignItems: 'center',
-    paddingTop: 60,
-    paddingHorizontal: 32,
+    paddingTop: 72,
+    paddingHorizontal: 36,
   },
   emptyEmoji: {
     fontSize: 56,
-    marginBottom: 16,
+    marginBottom: Spacing.lg,
   },
   emptyTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#0F172A',
-    marginBottom: 8,
+    ...Typography.h2,
+    color: Colors.textPrimary,
+    marginBottom: Spacing.sm,
+    textAlign: 'center',
   },
   emptySubtitle: {
-    fontSize: 14,
-    color: '#94A3B8',
+    ...Typography.bodySm,
+    color: Colors.textFaint,
     textAlign: 'center',
-    lineHeight: 21,
   },
 });

@@ -13,17 +13,9 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
+import { Colors, Typography, Spacing, Radius, Shadow, GradientPresets } from '../theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ArticleDetail'>;
-
-const CATEGORY_COLORS: Record<string, string> = {
-  LLMs: '#6C63FF',
-  'Image AI': '#F59E0B',
-  Agents: '#10B981',
-  Techniques: '#3B82F6',
-  Ethics: '#EF4444',
-  Tools: '#8B5CF6',
-};
 
 export default function ArticleDetailScreen({ route, navigation }: Props) {
   const { article } = route.params;
@@ -42,7 +34,7 @@ export default function ArticleDetailScreen({ route, navigation }: Props) {
     );
   }
 
-  const categoryColor = CATEGORY_COLORS[article.category] ?? '#6C63FF';
+  const categoryColor = Colors.categories[article.category] ?? Colors.primary;
 
   // Render the article content with basic markdown-like formatting
   const renderContent = (content: string) => {
@@ -143,11 +135,11 @@ export default function ArticleDetailScreen({ route, navigation }: Props) {
       >
         {/* Article Header */}
         <LinearGradient
-          colors={['#F8F7FF', '#FFFFFF']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 0, y: 1 }}
-          style={styles.articleHeader}
-        >
+        colors={GradientPresets.heroCard}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={styles.articleHeader}
+      >
           <View style={[styles.emojiContainer, { backgroundColor: `${categoryColor}15` }]}>
             <Text style={styles.emoji}>{article.emoji}</Text>
           </View>
@@ -222,76 +214,75 @@ export default function ArticleDetailScreen({ route, navigation }: Props) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
-    paddingTop: Platform.OS === 'android' ? 24 : 0,
+    backgroundColor: Colors.surface,
+    paddingTop: Platform.OS === 'android' ? 28 : 0,
   },
   notFound: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: Colors.background,
   },
   notFoundEmoji: {
     fontSize: 56,
-    marginBottom: 16,
+    marginBottom: Spacing.lg,
   },
   notFoundText: {
-    fontSize: 18,
-    color: '#374151',
-    marginBottom: 20,
+    ...Typography.h2,
+    color: Colors.textSecondary,
+    marginBottom: Spacing.xl,
   },
   backBtn: {
-    backgroundColor: '#6C63FF',
-    borderRadius: 14,
-    paddingHorizontal: 24,
-    paddingVertical: 12,
+    backgroundColor: Colors.primary,
+    borderRadius: Radius.lg,
+    paddingHorizontal: Spacing['2xl'],
+    paddingVertical: Spacing.md,
+    ...Shadow.md,
   },
   backBtnText: {
-    color: '#FFFFFF',
+    color: Colors.textOnPrimary,
     fontWeight: '700',
+    fontSize: 15,
   },
   navBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#F1F5F9',
-    backgroundColor: '#FFFFFF',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 2,
+    borderBottomColor: Colors.borderLight,
+    backgroundColor: Colors.surface,
+    ...Shadow.xs,
   },
   backButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: Spacing.sm,
     paddingVertical: 4,
-    paddingRight: 12,
+    paddingRight: Spacing.md,
   },
   backButtonInner: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 34,
+    height: 34,
+    borderRadius: Radius.full,
     backgroundColor: '#EDE9FF',
     justifyContent: 'center',
     alignItems: 'center',
   },
   backIcon: {
     fontSize: 16,
-    color: '#6C63FF',
+    color: Colors.primary,
     fontWeight: '700',
   },
   backLabel: {
     fontSize: 15,
-    color: '#6C63FF',
-    fontWeight: '600',
+    color: Colors.primary,
+    fontWeight: '700',
   },
   navCategoryBadge: {
-    borderRadius: 20,
-    paddingHorizontal: 14,
+    borderRadius: Radius.full,
+    paddingHorizontal: Spacing.lg,
     paddingVertical: 6,
     borderWidth: 1,
   },
@@ -304,20 +295,20 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 48,
+    paddingBottom: 56,
   },
   articleHeader: {
-    paddingHorizontal: 20,
-    paddingTop: 24,
-    paddingBottom: 24,
+    paddingHorizontal: Spacing.xl,
+    paddingTop: Spacing['2xl'],
+    paddingBottom: Spacing['2xl'],
   },
   emojiContainer: {
     width: 64,
     height: 64,
-    borderRadius: 18,
+    borderRadius: Radius.xl,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 18,
+    marginBottom: Spacing.lg,
   },
   emoji: {
     fontSize: 30,
@@ -325,31 +316,27 @@ const styles = StyleSheet.create({
   coverImage: {
     width: '100%',
     height: 220,
-    borderRadius: 16,
-    marginBottom: 16,
+    borderRadius: Radius.xl,
+    marginBottom: Spacing.lg,
   },
   title: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: '#0F172A',
-    lineHeight: 32,
-    marginBottom: 12,
-    letterSpacing: -0.5,
+    ...Typography.displayMd,
+    color: Colors.textPrimary,
+    marginBottom: Spacing.md,
   },
   summary: {
-    fontSize: 16,
-    color: '#475569',
-    lineHeight: 24,
-    marginBottom: 18,
+    ...Typography.bodyLg,
+    color: Colors.textMuted,
+    marginBottom: Spacing.lg,
   },
   metaRow: {
     flexDirection: 'row',
-    marginBottom: 8,
+    marginBottom: Spacing.sm,
   },
   authorChip: {
     backgroundColor: '#EDE9FE',
-    borderRadius: 20,
-    paddingHorizontal: 14,
+    borderRadius: Radius.full,
+    paddingHorizontal: Spacing.lg,
     paddingVertical: 6,
     borderWidth: 1,
     borderColor: '#C7D2FE',
@@ -357,43 +344,48 @@ const styles = StyleSheet.create({
   authorText: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#6C63FF',
+    color: Colors.primary,
   },
   statsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 14,
+    marginBottom: Spacing.lg,
+    marginTop: Spacing.sm,
   },
   statItem: {
-    fontSize: 13,
-    color: '#9CA3AF',
+    ...Typography.bodyXs,
+    color: Colors.textFaint,
   },
   statDivider: {
     fontSize: 13,
-    color: '#D1D5DB',
-    marginHorizontal: 8,
+    color: Colors.borderMuted,
+    marginHorizontal: Spacing.sm,
   },
   tagsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 6,
+    gap: Spacing.xs,
   },
   tag: {
-    backgroundColor: '#F3F4F6',
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    backgroundColor: Colors.surfaceDim,
+    borderRadius: Radius.sm,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: 3,
+    borderWidth: 1,
+    borderColor: Colors.borderMuted,
   },
   tagText: {
     fontSize: 12,
-    color: '#6B7280',
+    color: Colors.textMuted,
     fontWeight: '500',
   },
   seriesChip: {
     backgroundColor: '#EDE9FE',
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    borderRadius: Radius.sm,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: 3,
+    borderWidth: 1,
+    borderColor: '#C7D2FE',
   },
   seriesChipText: {
     fontSize: 12,
@@ -401,121 +393,114 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   canonicalLink: {
-    marginTop: 14,
+    marginTop: Spacing.lg,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#EFF6FF',
-    borderRadius: 10,
-    paddingHorizontal: 14,
+    backgroundColor: Colors.infoBg,
+    borderRadius: Radius.md,
+    paddingHorizontal: Spacing.lg,
     paddingVertical: 10,
     borderWidth: 1,
-    borderColor: '#BFDBFE',
+    borderColor: Colors.infoBorder,
   },
   canonicalLinkText: {
-    color: '#1D4ED8',
+    color: Colors.info,
     fontSize: 13,
     fontWeight: '600',
   },
   divider: {
     height: 1,
-    backgroundColor: '#F3F4F6',
-    marginHorizontal: 20,
-    marginBottom: 24,
+    backgroundColor: Colors.borderLight,
+    marginHorizontal: Spacing.xl,
+    marginBottom: Spacing['2xl'],
   },
   contentContainer: {
-    paddingHorizontal: 20,
+    paddingHorizontal: Spacing.xl,
   },
   heading2: {
     fontSize: 20,
     fontWeight: '800',
-    color: '#0F172A',
+    color: Colors.textPrimary,
     marginTop: 28,
-    marginBottom: 10,
+    marginBottom: Spacing.sm,
     letterSpacing: -0.3,
   },
   heading3: {
     fontSize: 17,
     fontWeight: '700',
-    color: '#1E293B',
-    marginTop: 20,
-    marginBottom: 8,
+    color: Colors.textSecondary,
+    marginTop: Spacing.xl,
+    marginBottom: Spacing.sm,
   },
   paragraph: {
-    fontSize: 15,
+    ...Typography.bodyMd,
     color: '#334155',
-    lineHeight: 26,
-    marginBottom: 6,
+    marginBottom: Spacing.sm,
   },
   bulletRow: {
     flexDirection: 'row',
-    marginBottom: 8,
+    marginBottom: Spacing.sm,
     paddingLeft: 4,
   },
   bulletDot: {
     fontSize: 15,
-    color: '#6C63FF',
-    marginRight: 10,
+    color: Colors.primary,
+    marginRight: Spacing.sm,
     marginTop: 2,
     width: 18,
     fontWeight: '700',
   },
   bulletText: {
     flex: 1,
-    fontSize: 15,
+    ...Typography.bodyMd,
     color: '#334155',
-    lineHeight: 24,
   },
   tableRow: {
     flexDirection: 'row',
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-    paddingVertical: 8,
+    borderBottomColor: Colors.borderMuted,
+    paddingVertical: Spacing.sm,
   },
   tableHeaderRow: {
-    backgroundColor: '#F9FAFB',
+    backgroundColor: Colors.surfaceDim,
   },
   tableCell: {
     flex: 1,
     fontSize: 13,
-    color: '#374151',
+    color: Colors.textSecondary,
     paddingHorizontal: 4,
   },
   tableHeaderCell: {
     fontWeight: '700',
-    color: '#111827',
+    color: Colors.textPrimary,
   },
   spacer: {
-    height: 10,
+    height: Spacing.sm,
   },
   articleFooter: {
-    marginTop: 40,
-    marginHorizontal: 20,
-    padding: 24,
+    marginTop: 48,
+    marginHorizontal: Spacing.xl,
+    padding: Spacing['2xl'],
     backgroundColor: '#F8F7FF',
-    borderRadius: 20,
+    borderRadius: Radius['2xl'],
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#EDE9FF',
   },
   footerText: {
-    fontSize: 14,
-    color: '#6C63FF',
-    marginBottom: 18,
-    fontWeight: '600',
+    ...Typography.labelLg,
+    color: Colors.primary,
+    marginBottom: Spacing.lg,
   },
   backToListButton: {
-    backgroundColor: '#6C63FF',
-    borderRadius: 14,
-    paddingHorizontal: 28,
-    paddingVertical: 13,
-    shadowColor: '#4F46E5',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 5,
+    backgroundColor: Colors.primary,
+    borderRadius: Radius.lg,
+    paddingHorizontal: Spacing['3xl'],
+    paddingVertical: 14,
+    ...Shadow.md,
   },
   backToListText: {
-    color: '#FFFFFF',
+    color: Colors.textOnPrimary,
     fontSize: 15,
     fontWeight: '700',
     letterSpacing: 0.2,
