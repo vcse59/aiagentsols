@@ -18,6 +18,7 @@ const {
 } = require('./auth');
 const {
   createArticle,
+  deleteArticle,
   getAdminArticles,
   getArticleById,
   getPublishedArticles,
@@ -243,6 +244,19 @@ app.put('/api/admin/articles/:id', requireAdmin, async (req, res, next) => {
     }
 
     res.json({ article });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.delete('/api/admin/articles/:id', requireAdmin, async (req, res, next) => {
+  try {
+    const article = await deleteArticle(req.params.id);
+    if (!article) {
+      return res.status(404).json({ error: 'Article not found.' });
+    }
+
+    res.status(204).send();
   } catch (error) {
     next(error);
   }

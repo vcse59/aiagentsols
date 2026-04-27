@@ -70,6 +70,12 @@ export function updateAdminArticle(id: string, payload: ArticleInput) {
   });
 }
 
+export function deleteAdminArticle(id: string) {
+  return request<void>(`/api/admin/articles/${id}`, {
+    method: 'DELETE',
+  });
+}
+
 export function uploadAdminMarkdown(formData: FormData) {
   return request<{ article: DisplayArticle }>('/api/admin/articles/upload', {
     method: 'POST',

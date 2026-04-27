@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   Platform,
   SafeAreaView,
   ScrollView,
@@ -14,7 +15,14 @@ import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { CATEGORIES } from '../data/articles';
 import { useAuth } from '../context/AuthContext';
-import { createAdminArticle, getAdminArticles, importAdminMarkdown, updateAdminArticle, uploadAdminMarkdown } from '../lib/api';
+import {
+  createAdminArticle,
+  deleteAdminArticle,
+  getAdminArticles,
+  importAdminMarkdown,
+  updateAdminArticle,
+  uploadAdminMarkdown,
+} from '../lib/api';
 import { RootStackParamList } from '../types/navigation';
 import type { ArticleInput, DisplayArticle, ManagedArticleStatus } from '../types/articles';
 
@@ -93,6 +101,7 @@ export default function AdminEditorScreen({ navigation }: Props) {
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [markdownImportText, setMarkdownImportText] = useState('');
@@ -248,6 +257,53 @@ export default function AdminEditorScreen({ navigation }: Props) {
       setError(importError instanceof Error ? importError.message : 'Unable to import markdown content.');
     } finally {
       setIsImporting(false);
+    }
+  };
+
+  const confirmDeleteArticle = () => {
+    if (!selectedArticle) {
+      return;
+    }
+
+    const message = `Delete "${selectedArticle.title}" permanently?`;
+
+    if (Platform.OS === 'web' && typeof window !== 'undefined') {
+      if (window.confirm(message)) {
+        void deleteSelectedArticle();
+      }
+      return;
+    }
+
+    Alert.alert('Delete article', message, [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: () => {
+          void deleteSelectedArticle();
+        },
+      },
+    ]);
+  };
+
+  const deleteSelectedArticle = async () => {
+    if (!selectedArticleId) {
+      return;
+    }
+
+    setIsDeleting(true);
+    setError('');
+    setSuccessMessage('');
+
+    try {
+      await deleteAdminArticle(selectedArticleId);
+      resetEditor();
+      setSuccessMessage('Article deleted successfully.');
+      await loadArticles();
+    } catch (deleteError) {
+      setError(deleteError instanceof Error ? deleteError.message : 'Unable to delete article.');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -432,6 +488,11 @@ export default function AdminEditorScreen({ navigation }: Props) {
             <TouchableOpacity style={styles.primaryButtonDark} onPress={() => saveArticle('published')} disabled={isLoading}>
               <Text style={styles.primaryButtonText}>Publish Article</Text>
             </TouchableOpacity>
+            {selectedArticleId ? (
+              <TouchableOpacity style={styles.destructiveButton} onPress={confirmDeleteArticle} disabled={isDeleting}>
+                <Text style={styles.destructiveButtonText}>{isDeleting ? 'Deleting...' : 'Delete Article'}</Text>
+              </TouchableOpacity>
+            ) : null}
           </View>
         </View>
       </ScrollView>
@@ -673,6 +734,17 @@ const styles = StyleSheet.create({
   },
   secondaryButtonText: {
     color: '#0F766E',
+    fontWeight: '800',
+    fontSize: 14,
+  },
+  destructiveButton: {
+    backgroundColor: '#FEE4E2',
+    borderRadius: 16,
+    paddingHorizontal: 18,
+    paddingVertical: 14,
+  },
+  destructiveButtonText: {
+    color: '#B42318',
     fontWeight: '800',
     fontSize: 14,
   },

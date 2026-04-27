@@ -277,6 +277,27 @@ async function updateArticle(id, input) {
   return record;
 }
 
+async function deleteArticle(id) {
+  const records = await readIndex();
+  const index = records.findIndex((record) => record.id === id);
+  if (index === -1) {
+    return null;
+  }
+
+  const [removedRecord] = records.splice(index, 1);
+
+  try {
+    await fs.unlink(path.join(MARKDOWN_DIR, removedRecord.markdownFile));
+  } catch (error) {
+    if (error?.code !== 'ENOENT') {
+      throw error;
+    }
+  }
+
+  await writeIndex(records);
+  return removedRecord;
+}
+
 function parseMarkdownUpload(markdownText, fallbackFields = {}) {
   const parsed = matter(markdownText);
   const frontmatter = parsed.data || {};
@@ -308,6 +329,7 @@ function parseMarkdownUpload(markdownText, fallbackFields = {}) {
 module.exports = {
   CATEGORIES,
   createArticle,
+  deleteArticle,
   getAdminArticles,
   getArticleById,
   getPublishedArticles,
