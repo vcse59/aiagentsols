@@ -11,6 +11,7 @@ import {
   ScrollView,
   Platform,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useAuth } from '../context/AuthContext';
@@ -88,44 +89,57 @@ export default function ArticlesScreen({ navigation }: Props) {
   return (
     <SafeAreaView style={styles.safeArea}>
       {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerLeft}>
-          <Text style={styles.headerGreeting}>
-            {admin ? `Signed in as ${admin.email}` : 'Open access for readers'}
-          </Text>
-          <Text style={styles.headerTitle}>Generative AI Knowledge Hub</Text>
-        </View>
-        <View style={styles.headerActions}>
-          {admin ? (
-            <>
+      <LinearGradient
+        colors={['#4F46E5', '#7C3AED']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.header}
+      >
+        <View style={styles.headerTop}>
+          <View style={styles.headerLeft}>
+            <View style={styles.brandRow}>
+              <Text style={styles.brandIcon}>🤖</Text>
+              <Text style={styles.brandName}>AI Agents Solutions</Text>
+            </View>
+            <Text style={styles.headerTitle}>Generative AI Knowledge Hub</Text>
+          </View>
+          <View style={styles.headerActions}>
+            {admin ? (
+              <>
+                <TouchableOpacity
+                  style={styles.manageButton}
+                  onPress={() => navigation.navigate('AdminEditor')}
+                  activeOpacity={0.85}
+                >
+                  <Text style={styles.manageButtonText}>✏️ Manage</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.signOutButton}
+                  onPress={() => {
+                    void signOut();
+                  }}
+                  activeOpacity={0.8}
+                >
+                  <Text style={styles.signOutText}>Sign Out</Text>
+                </TouchableOpacity>
+              </>
+            ) : (
               <TouchableOpacity
                 style={styles.manageButton}
-                onPress={() => navigation.navigate('AdminEditor')}
+                onPress={() => navigation.navigate('AdminLogin')}
                 activeOpacity={0.85}
               >
-                <Text style={styles.manageButtonText}>Manage Articles</Text>
+                <Text style={styles.manageButtonText}>Admin Login</Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.signOutButton}
-                onPress={() => {
-                  void signOut();
-                }}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.signOutText}>Sign Out</Text>
-              </TouchableOpacity>
-            </>
-          ) : (
-            <TouchableOpacity
-              style={styles.manageButton}
-              onPress={() => navigation.navigate('AdminLogin')}
-              activeOpacity={0.85}
-            >
-              <Text style={styles.manageButtonText}>Admin Login</Text>
-            </TouchableOpacity>
-          )}
+            )}
+          </View>
         </View>
-      </View>
+        {admin ? (
+          <View style={styles.adminBadge}>
+            <Text style={styles.adminBadgeText}>✓ Signed in as {admin.email}</Text>
+          </View>
+        ) : null}
+      </LinearGradient>
 
       {loadError ? (
         <View style={styles.bannerWarning}>
@@ -134,22 +148,24 @@ export default function ArticlesScreen({ navigation }: Props) {
       ) : null}
 
       {/* Search Bar */}
-      <View style={styles.searchContainer}>
-        <Text style={styles.searchIcon}>🔎</Text>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search articles, topics, authors..."
-          placeholderTextColor="#9CA3AF"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          clearButtonMode="while-editing"
-          returnKeyType="search"
-        />
-        {searchQuery.length > 0 && (
-          <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearButton}>
-            <Text style={styles.clearIcon}>✕</Text>
-          </TouchableOpacity>
-        )}
+      <View style={styles.searchWrapper}>
+        <View style={styles.searchContainer}>
+          <Text style={styles.searchIcon}>🔍</Text>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search articles, topics, authors..."
+            placeholderTextColor="#94A3B8"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            clearButtonMode="while-editing"
+            returnKeyType="search"
+          />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearButton}>
+              <Text style={styles.clearIcon}>✕</Text>
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
 
       {/* Category Filter */}
@@ -222,31 +238,44 @@ export default function ArticlesScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: '#F0F4FF',
     paddingTop: Platform.OS === 'android' ? 24 : 0,
   },
   header: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 20,
+  },
+  headerTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 12,
-    backgroundColor: '#16324F',
   },
   headerLeft: {
     flex: 1,
-    paddingRight: 16,
+    paddingRight: 12,
   },
-  headerGreeting: {
+  brandRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 6,
+  },
+  brandIcon: {
+    fontSize: 18,
+  },
+  brandName: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.8)',
-    marginBottom: 2,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.85)',
+    letterSpacing: 0.3,
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: '700',
+    fontSize: 22,
+    fontWeight: '800',
     color: '#FFFFFF',
+    letterSpacing: -0.3,
+    lineHeight: 28,
   },
   headerActions: {
     flexDirection: 'row',
@@ -255,94 +284,125 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   manageButton: {
-    backgroundColor: '#F0FDF9',
+    backgroundColor: 'rgba(255,255,255,0.2)',
     borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 7,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.35)',
   },
   manageButtonText: {
-    color: '#0F766E',
+    color: '#FFFFFF',
     fontSize: 13,
     fontWeight: '700',
   },
   signOutButton: {
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    backgroundColor: 'rgba(0,0,0,0.15)',
     borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 7,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.3)',
+    borderColor: 'rgba(255,255,255,0.2)',
   },
   signOutText: {
-    color: '#FFFFFF',
+    color: 'rgba(255,255,255,0.9)',
     fontSize: 13,
+    fontWeight: '600',
+  },
+  adminBadge: {
+    marginTop: 12,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    alignSelf: 'flex-start',
+  },
+  adminBadgeText: {
+    color: 'rgba(255,255,255,0.95)',
+    fontSize: 12,
     fontWeight: '600',
   },
   bannerWarning: {
     backgroundColor: '#FEF3C7',
     paddingHorizontal: 16,
     paddingVertical: 10,
+    borderLeftWidth: 4,
+    borderLeftColor: '#F59E0B',
   },
   bannerWarningText: {
     color: '#92400E',
     fontSize: 13,
     fontWeight: '600',
   },
+  searchWrapper: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 4,
+  },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
-    marginHorizontal: 16,
-    marginTop: 16,
-    marginBottom: 4,
-    borderRadius: 12,
+    borderRadius: 16,
     paddingHorizontal: 14,
-    paddingVertical: Platform.OS === 'ios' ? 10 : 4,
-    shadowColor: '#000',
+    paddingVertical: Platform.OS === 'ios' ? 12 : 6,
+    shadowColor: '#4F46E5',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#E8E4FF',
   },
   searchIcon: {
     fontSize: 16,
-    marginRight: 8,
+    marginRight: 10,
   },
   searchInput: {
     flex: 1,
-    fontSize: 14,
-    color: '#1F2937',
+    fontSize: 15,
+    color: '#0F172A',
+    fontWeight: '400',
   },
   clearButton: {
-    paddingLeft: 8,
+    paddingLeft: 10,
+    paddingRight: 2,
   },
   clearIcon: {
-    fontSize: 13,
-    color: '#9CA3AF',
+    fontSize: 14,
+    color: '#94A3B8',
   },
   categoryWrapper: {
-    marginTop: 12,
+    marginTop: 14,
   },
   categoryScroll: {
     paddingHorizontal: 16,
     gap: 8,
   },
   categoryChip: {
-    paddingHorizontal: 16,
-    paddingVertical: 7,
+    paddingHorizontal: 18,
+    paddingVertical: 8,
     borderRadius: 20,
     backgroundColor: '#FFFFFF',
     borderWidth: 1.5,
-    borderColor: '#E5E7EB',
+    borderColor: '#DDD8FF',
+    shadowColor: '#4F46E5',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 1,
   },
   categoryChipActive: {
     backgroundColor: '#6C63FF',
     borderColor: '#6C63FF',
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 4,
   },
   categoryChipText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#6B7280',
+    color: '#6C63FF',
   },
   categoryChipTextActive: {
     color: '#FFFFFF',
@@ -350,12 +410,15 @@ const styles = StyleSheet.create({
   resultBar: {
     paddingHorizontal: 20,
     paddingTop: 14,
-    paddingBottom: 4,
+    paddingBottom: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   resultText: {
     fontSize: 13,
-    color: '#9CA3AF',
-    fontWeight: '500',
+    color: '#64748B',
+    fontWeight: '600',
   },
   loadingRow: {
     flexDirection: 'row',
@@ -365,14 +428,14 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
   loadingText: {
-    color: '#5C6C7C',
+    color: '#64748B',
     fontSize: 13,
     fontWeight: '600',
   },
   listContent: {
     paddingHorizontal: 16,
     paddingTop: 8,
-    paddingBottom: 32,
+    paddingBottom: 40,
   },
   emptyState: {
     alignItems: 'center',
@@ -380,19 +443,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
   },
   emptyEmoji: {
-    fontSize: 48,
+    fontSize: 56,
     marginBottom: 16,
   },
   emptyTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '700',
-    color: '#374151',
+    color: '#0F172A',
     marginBottom: 8,
   },
   emptySubtitle: {
     fontSize: 14,
-    color: '#9CA3AF',
+    color: '#94A3B8',
     textAlign: 'center',
-    lineHeight: 20,
+    lineHeight: 21,
   },
 });

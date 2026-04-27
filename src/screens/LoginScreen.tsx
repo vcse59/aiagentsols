@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   ScrollView,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useAuth } from '../context/AuthContext';
 import { RootStackParamList } from '../types/navigation';
@@ -48,6 +49,12 @@ export default function LoginScreen({ navigation }: Props) {
   };
 
   return (
+    <LinearGradient
+      colors={['#4F46E5', '#7C3AED', '#6C63FF']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={styles.gradient}
+    >
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -152,13 +159,17 @@ export default function LoginScreen({ navigation }: Props) {
         <Text style={styles.footer}>© 2026 AI Agents Solutions. All rights reserved.</Text>
       </ScrollView>
     </KeyboardAvoidingView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
+  gradient: {
+    flex: 1,
+  },
   container: {
     flex: 1,
-    backgroundColor: '#6C63FF',
+    backgroundColor: 'transparent',
   },
   scrollContent: {
     flexGrow: 1,
@@ -171,49 +182,63 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   logoContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 86,
+    height: 86,
+    borderRadius: 43,
     backgroundColor: 'rgba(255,255,255,0.2)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 18,
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.35)',
   },
   logoIcon: {
-    fontSize: 40,
+    fontSize: 42,
   },
   appTitle: {
-    fontSize: 26,
-    fontWeight: '700',
+    fontSize: 28,
+    fontWeight: '800',
     color: '#FFFFFF',
     textAlign: 'center',
+    letterSpacing: -0.5,
   },
   appSubtitle: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.8)',
-    marginTop: 4,
+    color: 'rgba(255,255,255,0.75)',
+    marginTop: 6,
     textAlign: 'center',
+    letterSpacing: 0.2,
   },
   card: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 20,
+    borderRadius: 24,
     padding: 28,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
-    shadowRadius: 20,
-    elevation: 10,
+    shadowColor: '#2D1B69',
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.25,
+    shadowRadius: 24,
+    elevation: 12,
+    borderTopWidth: 4,
+    borderTopColor: '#6C63FF',
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    borderBottomWidth: 1,
+    borderLeftColor: '#EDE9FF',
+    borderRightColor: '#EDE9FF',
+    borderBottomColor: '#EDE9FF',
   },
   cardTitle: {
     fontSize: 22,
-    fontWeight: '700',
-    color: '#1F2937',
+    fontWeight: '800',
+    color: '#0F172A',
     marginBottom: 6,
+    letterSpacing: -0.3,
   },
   cardSubtitle: {
     fontSize: 14,
-    color: '#6B7280',
+    color: '#64748B',
     marginBottom: 24,
+    lineHeight: 20,
   },
   infoContainer: {
     backgroundColor: '#EFF6FF',
@@ -251,50 +276,50 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1.5,
-    borderColor: '#E5E7EB',
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+    borderColor: '#DDD8FF',
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 13,
     fontSize: 15,
-    color: '#1F2937',
-    backgroundColor: '#F9FAFB',
+    color: '#0F172A',
+    backgroundColor: '#FAFBFF',
   },
   passwordContainer: {
     flexDirection: 'row',
     borderWidth: 1.5,
-    borderColor: '#E5E7EB',
-    borderRadius: 12,
-    backgroundColor: '#F9FAFB',
+    borderColor: '#DDD8FF',
+    borderRadius: 14,
+    backgroundColor: '#FAFBFF',
     alignItems: 'center',
   },
   passwordInput: {
     flex: 1,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 13,
     fontSize: 15,
-    color: '#1F2937',
+    color: '#0F172A',
   },
   eyeButton: {
     paddingHorizontal: 14,
-    paddingVertical: 12,
+    paddingVertical: 13,
   },
   eyeIcon: {
     fontSize: 18,
   },
   signInButton: {
     backgroundColor: '#6C63FF',
-    borderRadius: 12,
-    paddingVertical: 14,
+    borderRadius: 14,
+    paddingVertical: 15,
     alignItems: 'center',
-    marginTop: 8,
-    shadowColor: '#6C63FF',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
+    marginTop: 10,
+    shadowColor: '#4F46E5',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    elevation: 6,
   },
   signInButtonDisabled: {
-    opacity: 0.7,
+    opacity: 0.65,
   },
   signInButtonText: {
     color: '#FFFFFF',

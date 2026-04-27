@@ -10,6 +10,7 @@ import {
   Image,
   Linking,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 
@@ -125,10 +126,12 @@ export default function ArticleDetailScreen({ route, navigation }: Props) {
       {/* Navigation Bar */}
       <View style={styles.navBar}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()} activeOpacity={0.8}>
-          <Text style={styles.backIcon}>←</Text>
-          <Text style={styles.backLabel}>Back</Text>
+          <View style={styles.backButtonInner}>
+            <Text style={styles.backIcon}>←</Text>
+          </View>
+          <Text style={styles.backLabel}>Articles</Text>
         </TouchableOpacity>
-        <View style={[styles.navCategoryBadge, { backgroundColor: `${categoryColor}18` }]}>
+        <View style={[styles.navCategoryBadge, { backgroundColor: `${categoryColor}12`, borderColor: `${categoryColor}30` }]}>
           <Text style={[styles.navCategoryText, { color: categoryColor }]}>{article.category}</Text>
         </View>
       </View>
@@ -139,8 +142,13 @@ export default function ArticleDetailScreen({ route, navigation }: Props) {
         showsVerticalScrollIndicator={false}
       >
         {/* Article Header */}
-        <View style={styles.articleHeader}>
-          <View style={styles.emojiContainer}>
+        <LinearGradient
+          colors={['#F8F7FF', '#FFFFFF']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+          style={styles.articleHeader}
+        >
+          <View style={[styles.emojiContainer, { backgroundColor: `${categoryColor}15` }]}>
             <Text style={styles.emoji}>{article.emoji}</Text>
           </View>
           {article.coverImage ? (
@@ -182,10 +190,10 @@ export default function ArticleDetailScreen({ route, navigation }: Props) {
                 void Linking.openURL(article.canonicalUrl as string);
               }}
             >
-              <Text style={styles.canonicalLinkText}>Canonical URL: {article.canonicalUrl}</Text>
+              <Text style={styles.canonicalLinkText}>🔗 View original article</Text>
             </TouchableOpacity>
           ) : null}
-        </View>
+        </LinearGradient>
 
         {/* Divider */}
         <View style={styles.divider} />
@@ -223,8 +231,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   notFoundEmoji: {
-    fontSize: 48,
-    marginBottom: 12,
+    fontSize: 56,
+    marginBottom: 16,
   },
   notFoundText: {
     fontSize: 18,
@@ -233,7 +241,7 @@ const styles = StyleSheet.create({
   },
   backBtn: {
     backgroundColor: '#6C63FF',
-    borderRadius: 12,
+    borderRadius: 14,
     paddingHorizontal: 24,
     paddingVertical: 12,
   },
@@ -248,19 +256,33 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
+    borderBottomColor: '#F1F5F9',
     backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   backButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 6,
+    gap: 8,
+    paddingVertical: 4,
     paddingRight: 12,
   },
+  backButtonInner: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#EDE9FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   backIcon: {
-    fontSize: 18,
+    fontSize: 16,
     color: '#6C63FF',
-    marginRight: 4,
+    fontWeight: '700',
   },
   backLabel: {
     fontSize: 15,
@@ -269,12 +291,14 @@ const styles = StyleSheet.create({
   },
   navCategoryBadge: {
     borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 5,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderWidth: 1,
   },
   navCategoryText: {
     fontSize: 12,
     fontWeight: '700',
+    letterSpacing: 0.3,
   },
   scroll: {
     flex: 1,
@@ -285,16 +309,15 @@ const styles = StyleSheet.create({
   articleHeader: {
     paddingHorizontal: 20,
     paddingTop: 24,
-    paddingBottom: 20,
+    paddingBottom: 24,
   },
   emojiContainer: {
-    width: 60,
-    height: 60,
-    borderRadius: 16,
-    backgroundColor: '#F3F4F6',
+    width: 64,
+    height: 64,
+    borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 18,
   },
   emoji: {
     fontSize: 30,
@@ -306,17 +329,18 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   title: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '800',
-    color: '#111827',
-    lineHeight: 30,
+    color: '#0F172A',
+    lineHeight: 32,
     marginBottom: 12,
+    letterSpacing: -0.5,
   },
   summary: {
-    fontSize: 15,
-    color: '#6B7280',
-    lineHeight: 22,
-    marginBottom: 16,
+    fontSize: 16,
+    color: '#475569',
+    lineHeight: 24,
+    marginBottom: 18,
   },
   metaRow: {
     flexDirection: 'row',
@@ -325,12 +349,14 @@ const styles = StyleSheet.create({
   authorChip: {
     backgroundColor: '#EDE9FE',
     borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 5,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderWidth: 1,
+    borderColor: '#C7D2FE',
   },
   authorText: {
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: '700',
     color: '#6C63FF',
   },
   statsRow: {
@@ -375,12 +401,20 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   canonicalLink: {
-    marginTop: 12,
+    marginTop: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#EFF6FF',
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: '#BFDBFE',
   },
   canonicalLinkText: {
     color: '#1D4ED8',
     fontSize: 13,
-    textDecorationLine: 'underline',
+    fontWeight: '600',
   },
   divider: {
     height: 1,
@@ -392,42 +426,44 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   heading2: {
-    fontSize: 19,
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#0F172A',
+    marginTop: 28,
+    marginBottom: 10,
+    letterSpacing: -0.3,
+  },
+  heading3: {
+    fontSize: 17,
     fontWeight: '700',
-    color: '#111827',
+    color: '#1E293B',
     marginTop: 20,
     marginBottom: 8,
   },
-  heading3: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#374151',
-    marginTop: 16,
-    marginBottom: 6,
-  },
   paragraph: {
     fontSize: 15,
-    color: '#374151',
-    lineHeight: 24,
-    marginBottom: 4,
+    color: '#334155',
+    lineHeight: 26,
+    marginBottom: 6,
   },
   bulletRow: {
     flexDirection: 'row',
-    marginBottom: 6,
+    marginBottom: 8,
     paddingLeft: 4,
   },
   bulletDot: {
     fontSize: 15,
     color: '#6C63FF',
-    marginRight: 8,
-    marginTop: 1,
+    marginRight: 10,
+    marginTop: 2,
     width: 18,
+    fontWeight: '700',
   },
   bulletText: {
     flex: 1,
     fontSize: 15,
-    color: '#374151',
-    lineHeight: 22,
+    color: '#334155',
+    lineHeight: 24,
   },
   tableRow: {
     flexDirection: 'row',
@@ -454,30 +490,34 @@ const styles = StyleSheet.create({
   articleFooter: {
     marginTop: 40,
     marginHorizontal: 20,
-    padding: 20,
-    backgroundColor: '#F8F9FA',
-    borderRadius: 16,
+    padding: 24,
+    backgroundColor: '#F8F7FF',
+    borderRadius: 20,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#EDE9FF',
   },
   footerText: {
     fontSize: 14,
-    color: '#6B7280',
-    marginBottom: 16,
+    color: '#6C63FF',
+    marginBottom: 18,
+    fontWeight: '600',
   },
   backToListButton: {
     backgroundColor: '#6C63FF',
-    borderRadius: 12,
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    shadowColor: '#6C63FF',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    elevation: 4,
+    borderRadius: 14,
+    paddingHorizontal: 28,
+    paddingVertical: 13,
+    shadowColor: '#4F46E5',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 5,
   },
   backToListText: {
     color: '#FFFFFF',
     fontSize: 15,
     fontWeight: '700',
+    letterSpacing: 0.2,
   },
 });

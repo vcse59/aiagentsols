@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { CATEGORIES } from '../data/articles';
@@ -318,7 +319,12 @@ export default function AdminEditorScreen({ navigation }: Props) {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.hero}>
+        <LinearGradient
+          colors={['#1E3A8A', '#4F46E5', '#7C3AED']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.hero}
+        >
           <Text style={styles.heroEyebrow}>Admin Workspace</Text>
           <Text style={styles.heroTitle}>Publish markdown articles without leaving the site.</Text>
           <Text style={styles.heroSubtitle}>
@@ -338,7 +344,7 @@ export default function AdminEditorScreen({ navigation }: Props) {
               <Text style={styles.ghostButtonText}>Sign Out</Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </LinearGradient>
 
         <View style={styles.panel}>
           <View style={styles.panelHeader}>
@@ -503,42 +509,42 @@ export default function AdminEditorScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F6F3EE',
+    backgroundColor: '#F0F4FF',
     paddingTop: Platform.OS === 'android' ? 24 : 0,
   },
   centeredState: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#F6F3EE',
+    backgroundColor: '#F0F4FF',
   },
   content: {
     padding: 20,
     gap: 18,
   },
   hero: {
-    backgroundColor: '#102A43',
     borderRadius: 24,
     padding: 24,
   },
   heroEyebrow: {
-    color: '#9FB3C8',
+    color: 'rgba(255,255,255,0.7)',
     fontSize: 12,
     fontWeight: '700',
     textTransform: 'uppercase',
-    letterSpacing: 1,
+    letterSpacing: 1.5,
     marginBottom: 10,
   },
   heroTitle: {
     color: '#FFFFFF',
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: '800',
-    lineHeight: 34,
+    lineHeight: 32,
     marginBottom: 10,
+    letterSpacing: -0.3,
   },
   heroSubtitle: {
-    color: '#D9E2EC',
-    fontSize: 15,
+    color: 'rgba(255,255,255,0.8)',
+    fontSize: 14,
     lineHeight: 22,
   },
   heroActions: {
@@ -552,47 +558,59 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     padding: 20,
     borderWidth: 1,
-    borderColor: '#E9E2D8',
+    borderColor: '#E8E4FF',
+    shadowColor: '#4F46E5',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 16,
+    elevation: 3,
   },
   panelHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 14,
+    marginBottom: 16,
   },
   panelTitle: {
     fontSize: 20,
     fontWeight: '800',
-    color: '#102A43',
+    color: '#0F172A',
+    letterSpacing: -0.3,
   },
   linkButton: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
     paddingVertical: 8,
-    borderRadius: 999,
-    backgroundColor: '#E0FBFC',
+    borderRadius: 20,
+    backgroundColor: '#EDE9FF',
+    borderWidth: 1,
+    borderColor: '#C7D2FE',
   },
   linkButtonText: {
-    color: '#0F766E',
+    color: '#6C63FF',
     fontWeight: '700',
+    fontSize: 13,
   },
   emptyText: {
-    color: '#5C6C7C',
+    color: '#94A3B8',
     fontSize: 14,
+    textAlign: 'center',
+    paddingVertical: 20,
   },
   articleRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 12,
-    borderRadius: 18,
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#E9E2D8',
+    borderColor: '#E8E4FF',
     padding: 14,
-    marginBottom: 12,
+    marginBottom: 10,
+    backgroundColor: '#FAFBFF',
   },
   articleRowActive: {
-    borderColor: '#0F766E',
-    backgroundColor: '#F0FDFA',
+    borderColor: '#6C63FF',
+    backgroundColor: '#F5F3FF',
   },
   articleRowCopy: {
     flex: 1,
@@ -600,12 +618,12 @@ const styles = StyleSheet.create({
   articleRowTitle: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#102A43',
+    color: '#0F172A',
     marginBottom: 4,
   },
   articleRowMeta: {
     fontSize: 12,
-    color: '#7B8794',
+    color: '#94A3B8',
   },
   statusBadge: {
     borderRadius: 999,
@@ -657,19 +675,20 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#243B53',
+    color: '#1E293B',
     marginBottom: 8,
-    marginTop: 14,
+    marginTop: 16,
+    letterSpacing: 0.2,
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#D9D2C7',
-    borderRadius: 16,
+    borderWidth: 1.5,
+    borderColor: '#DDD8FF',
+    borderRadius: 14,
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 15,
-    color: '#102A43',
-    backgroundColor: '#FFFCF8',
+    color: '#0F172A',
+    backgroundColor: '#FAFBFF',
   },
   multilineSmall: {
     minHeight: 88,
@@ -685,19 +704,19 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   categoryChip: {
-    borderRadius: 999,
-    paddingHorizontal: 14,
+    borderRadius: 20,
+    paddingHorizontal: 16,
     paddingVertical: 10,
-    borderWidth: 1,
-    borderColor: '#D9D2C7',
-    backgroundColor: '#FFFFFF',
+    borderWidth: 1.5,
+    borderColor: '#DDD8FF',
+    backgroundColor: '#FAFBFF',
   },
   categoryChipActive: {
-    backgroundColor: '#0F766E',
-    borderColor: '#0F766E',
+    backgroundColor: '#6C63FF',
+    borderColor: '#6C63FF',
   },
   categoryChipText: {
-    color: '#243B53',
+    color: '#6C63FF',
     fontWeight: '700',
   },
   categoryChipTextActive: {
@@ -710,50 +729,65 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   primaryButton: {
-    backgroundColor: '#0F766E',
-    borderRadius: 16,
+    backgroundColor: '#6C63FF',
+    borderRadius: 14,
     paddingHorizontal: 18,
-    paddingVertical: 14,
+    paddingVertical: 13,
+    shadowColor: '#4F46E5',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 5,
   },
   primaryButtonDark: {
-    backgroundColor: '#102A43',
-    borderRadius: 16,
+    backgroundColor: '#4F46E5',
+    borderRadius: 14,
     paddingHorizontal: 18,
-    paddingVertical: 14,
+    paddingVertical: 13,
+    shadowColor: '#3730A3',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 10,
+    elevation: 5,
   },
   primaryButtonText: {
     color: '#FFFFFF',
-    fontWeight: '800',
+    fontWeight: '700',
     fontSize: 14,
+    letterSpacing: 0.2,
   },
   secondaryButton: {
-    backgroundColor: '#E0FBFC',
-    borderRadius: 16,
+    backgroundColor: '#EDE9FF',
+    borderRadius: 14,
     paddingHorizontal: 18,
-    paddingVertical: 14,
+    paddingVertical: 13,
+    borderWidth: 1,
+    borderColor: '#C7D2FE',
   },
   secondaryButtonText: {
-    color: '#0F766E',
-    fontWeight: '800',
+    color: '#4F46E5',
+    fontWeight: '700',
     fontSize: 14,
   },
   destructiveButton: {
-    backgroundColor: '#FEE4E2',
-    borderRadius: 16,
+    backgroundColor: '#FEF2F2',
+    borderRadius: 14,
     paddingHorizontal: 18,
-    paddingVertical: 14,
+    paddingVertical: 13,
+    borderWidth: 1.5,
+    borderColor: '#FECACA',
   },
   destructiveButtonText: {
-    color: '#B42318',
-    fontWeight: '800',
+    color: '#DC2626',
+    fontWeight: '700',
     fontSize: 14,
   },
   ghostButton: {
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.24)',
-    borderRadius: 16,
+    borderColor: 'rgba(255,255,255,0.35)',
+    borderRadius: 14,
     paddingHorizontal: 18,
-    paddingVertical: 14,
+    paddingVertical: 13,
   },
   ghostButtonText: {
     color: '#FFFFFF',
