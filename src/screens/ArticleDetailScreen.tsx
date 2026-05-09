@@ -36,29 +36,99 @@ export default function ArticleDetailScreen({ route, navigation }: Props) {
 
   const categoryColor = Colors.categories[article.category] ?? Colors.primary;
 
-  // Render the article content with basic markdown-like formatting
+  // Handle inline markdown: **bold**, *italic*, `code`, [link](url)
+  const renderInlineMarkdown = (text: string): React.ReactNode[] => {
+    const parts: React.ReactNode[] = [];
+    const regex = /(\*\*(.+?)\*\*|`([^`]+)`|\[([^\]]+)\]\(([^)]+)\)|\*(.+?)\*)/g;
+    let lastIndex = 0;
+    let inlineKey = 0;
+    let match: RegExpExecArray | null;
+
+    while ((match = regex.exec(text)) !== null) {
+      if (match.index > lastIndex) {
+        parts.push(text.slice(lastIndex, match.index));
+      }
+      if (match[2] !== undefined) {
+        parts.push(<Text key={inlineKey++} style={styles.bold}>{match[2]}</Text>);
+      } else if (match[3] !== undefined) {
+        parts.push(<Text key={inlineKey++} style={styles.inlineCode}>{match[3]}</Text>);
+      } else if (match[4] !== undefined && match[5] !== undefined) {
+        const linkUrl = match[5];
+        parts.push(
+          <Text key={inlineKey++} style={styles.link} onPress={() => { void Linking.openURL(linkUrl); }}>
+            {match[4]}
+          </Text>
+        );
+      } else if (match[6] !== undefined) {
+        parts.push(<Text key={inlineKey++} style={styles.italic}>{match[6]}</Text>);
+      }
+      lastIndex = match.index + match[0].length;
+    }
+    if (lastIndex < text.length) {
+      parts.push(text.slice(lastIndex));
+    }
+    return parts.length > 0 ? parts : [text];
+  };
+
+  // Render the article content with full markdown formatting support
   const renderContent = (content: string) => {
     const lines = content.split('\n');
     const elements: React.ReactElement[] = [];
     let key = 0;
+    let inCodeBlock = false;
+    let codeBlockLines: string[] = [];
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
 
-      if (line.startsWith('## ')) {
+      // Fenced code blocks
+      if (line.startsWith('```')) {
+        if (!inCodeBlock) {
+          inCodeBlock = true;
+          codeBlockLines = [];
+        } else {
+          inCodeBlock = false;
+          const codeContent = codeBlockLines.join('\n');
+          elements.push(
+            <ScrollView key={key++} horizontal showsHorizontalScrollIndicator style={styles.codeBlockScroll}>
+              <View style={styles.codeBlock}>
+                <Text style={styles.codeText}>{codeContent}</Text>
+              </View>
+            </ScrollView>
+          );
+          codeBlockLines = [];
+        }
+        continue;
+      }
+
+      if (inCodeBlock) {
+        codeBlockLines.push(line);
+        continue;
+      }
+
+      // Horizontal rule
+      if (/^(-{3,}|\*{3,}|_{3,})$/.test(line.trim())) {
+        elements.push(<View key={key++} style={styles.horizontalRule} />);
+      } else if (line.startsWith('# ')) {
+        elements.push(
+          <Text key={key++} style={styles.heading1}>
+            {renderInlineMarkdown(line.replace(/^# /, ''))}
+          </Text>
+        );
+      } else if (line.startsWith('## ')) {
         elements.push(
           <Text key={key++} style={styles.heading2}>
-            {line.replace('## ', '')}
+            {renderInlineMarkdown(line.replace(/^## /, ''))}
           </Text>
         );
       } else if (line.startsWith('### ')) {
         elements.push(
           <Text key={key++} style={styles.heading3}>
-            {line.replace('### ', '')}
+            {renderInlineMarkdown(line.replace(/^### /, ''))}
           </Text>
         );
       } else if (line.startsWith('| ')) {
-        // Simple table row rendering
+        // Table row rendering
         const cells = line
           .split('|')
           .filter((c) => c.trim() !== '')
@@ -81,12 +151,25 @@ export default function ArticleDetailScreen({ route, navigation }: Props) {
           );
         }
       } else if (line.startsWith('- ') || line.startsWith('* ')) {
-        elements.push(
-          <View key={key++} style={styles.bulletRow}>
-            <Text style={styles.bulletDot}>•</Text>
-            <Text style={styles.bulletText}>{renderInlineMarkdown(line.replace(/^[-*] /, ''))}</Text>
-          </View>
-        );
+        const rawText = line.replace(/^[-*] /, '');
+        const isChecked = /^\[x\] /i.test(rawText);
+        const isUnchecked = /^\[ \] /.test(rawText);
+        if (isChecked || isUnchecked) {
+          const taskText = rawText.replace(/^\[.?\] /, '');
+          elements.push(
+            <View key={key++} style={styles.bulletRow}>
+              <Text style={styles.checkboxIcon}>{isChecked ? '☑' : '☐'}</Text>
+              <Text style={[styles.bulletText, isChecked && styles.checkedText]}>{renderInlineMarkdown(taskText)}</Text>
+            </View>
+          );
+        } else {
+          elements.push(
+            <View key={key++} style={styles.bulletRow}>
+              <Text style={styles.bulletDot}>•</Text>
+              <Text style={styles.bulletText}>{renderInlineMarkdown(rawText)}</Text>
+            </View>
+          );
+        }
       } else if (/^\d+\. /.test(line)) {
         const num = line.match(/^(\d+)\. /)?.[1] ?? '';
         elements.push(
@@ -106,11 +189,6 @@ export default function ArticleDetailScreen({ route, navigation }: Props) {
       }
     }
     return elements;
-  };
-
-  // Handle **bold** inline markdown
-  const renderInlineMarkdown = (text: string): string => {
-    return text.replace(/\*\*(.*?)\*\*/g, '$1');
   };
 
   return (
@@ -417,6 +495,14 @@ const styles = StyleSheet.create({
   contentContainer: {
     paddingHorizontal: Spacing.xl,
   },
+  heading1: {
+    fontSize: 26,
+    fontWeight: '900',
+    color: Colors.textPrimary,
+    marginTop: 32,
+    marginBottom: Spacing.md,
+    letterSpacing: -0.5,
+  },
   heading2: {
     fontSize: 20,
     fontWeight: '800',
@@ -476,6 +562,59 @@ const styles = StyleSheet.create({
   },
   spacer: {
     height: Spacing.sm,
+  },
+  bold: {
+    fontWeight: '700',
+    color: '#1e293b',
+  },
+  italic: {
+    fontStyle: 'italic',
+    color: '#334155',
+  },
+  inlineCode: {
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+    fontSize: 13,
+    backgroundColor: '#F1F5F9',
+    color: '#B91C1C',
+    paddingHorizontal: 4,
+    paddingVertical: 1,
+    borderRadius: 4,
+  },
+  link: {
+    color: Colors.primary,
+    textDecorationLine: 'underline',
+    fontWeight: '500',
+  },
+  codeBlockScroll: {
+    marginVertical: Spacing.md,
+  },
+  codeBlock: {
+    backgroundColor: '#1E293B',
+    borderRadius: Radius.md,
+    padding: Spacing.lg,
+    minWidth: '100%',
+  },
+  codeText: {
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+    fontSize: 12,
+    color: '#E2E8F0',
+    lineHeight: 20,
+  },
+  horizontalRule: {
+    height: 1,
+    backgroundColor: Colors.borderMuted,
+    marginVertical: Spacing.xl,
+  },
+  checkboxIcon: {
+    fontSize: 16,
+    color: Colors.primary,
+    marginRight: Spacing.sm,
+    marginTop: 1,
+    width: 18,
+  },
+  checkedText: {
+    textDecorationLine: 'line-through',
+    color: Colors.textFaint,
   },
   articleFooter: {
     marginTop: 48,
