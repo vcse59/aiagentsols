@@ -438,4 +438,45 @@ const styles = StyleSheet.create({
     paddingBottom: Spacing.sm,
   },
   loadingText: {
- 
+    ...Typography.labelMd,
+    color: Colors.textMuted,
+  },
+  listContent: {
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.sm,
+    paddingBottom: 48,
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingTop: 64,
+    paddingHorizontal: 40,
+  },
+  emptyEmoji: {
+    fontSize: 52,
+    marginBottom: Spacing.lg,
+  },
+  emptyTitle: {
+    ...Typography.h2,
+    color: Colors.textPrimary,
+    marginBottom: Spacing.sm,
+    textAlign: 'center',
+  },
+  emptySubtitle: {
+    ...Typography.bodySm,
+    color: Colors.textFaint,
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: Spacing.xl,
+  },
+  clearSearchBtn: {
+    backgroundColor: Colors.primary,
+    borderRadius: Radius.full,
+    paddingHorizontal: Spacing.xl,
+    paddingVertical: 10,
+  },
+  clearSearchBtnText: {
+    color: Colors.textOnPrimary,
+    fontSize: 13,
+    fontWeight: '700',
+  },
+});

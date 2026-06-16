@@ -13,25 +13,28 @@ export default function ArticleCard({ article, onPress }: ArticleCardProps) {
 
   return (
     <TouchableOpacity
-      style={[styles.card, { borderLeftColor: categoryColor }]}
+      style={styles.card}
       onPress={onPress}
       activeOpacity={0.82}
     >
+      {/* Category accent line */}
+      <View style={[styles.accentLine, { backgroundColor: categoryColor }]} />
+
       {article.coverImage ? (
         <Image source={{ uri: article.coverImage }} style={styles.coverImage} resizeMode="cover" />
       ) : null}
 
       {/* Top row */}
       <View style={styles.topRow}>
-        <View style={[styles.emojiWrap, { backgroundColor: `${categoryColor}18` }]}>
+        <View style={[styles.emojiWrap, { backgroundColor: `${categoryColor}15` }]}>
           <Text style={styles.emoji}>{article.emoji}</Text>
         </View>
         <View style={styles.topRowRight}>
-          <View style={[styles.categoryPill, { backgroundColor: `${categoryColor}14`, borderColor: `${categoryColor}38` }]}>
+          <View style={[styles.categoryPill, { backgroundColor: `${categoryColor}12` }]}>
             <Text style={[styles.categoryText, { color: categoryColor }]}>{article.category}</Text>
           </View>
-          <View style={[styles.arrowWrap, { backgroundColor: `${categoryColor}12` }]}>
-            <Text style={[styles.arrowIcon, { color: categoryColor }]}>›</Text>
+          <View style={styles.arrowWrap}>
+            <Text style={[styles.arrowIcon, { color: categoryColor }]}>→</Text>
           </View>
         </View>
       </View>
@@ -75,16 +78,19 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: Colors.surface,
     borderRadius: Radius['2xl'],
-    padding: Spacing.xl,
+    paddingHorizontal: Spacing.xl,
+    paddingTop: Spacing.lg,
+    paddingBottom: Spacing.xl,
     marginBottom: Spacing.md,
-    borderLeftWidth: 4,
-    borderTopWidth: 0.5,
-    borderRightWidth: 0.5,
-    borderBottomWidth: 0.5,
-    borderTopColor: Colors.borderLight,
-    borderRightColor: Colors.borderLight,
-    borderBottomColor: Colors.borderLight,
-    ...Shadow.md,
+    borderWidth: 1,
+    borderColor: Colors.borderLight,
+    ...Shadow.sm,
+  },
+  accentLine: {
+    height: 3,
+    borderRadius: Radius.full,
+    marginBottom: Spacing.lg,
+    width: 36,
   },
   coverImage: {
     width: '100%',
@@ -104,47 +110,46 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   emojiWrap: {
-    width: 48,
-    height: 48,
-    borderRadius: Radius.md,
+    width: 44,
+    height: 44,
+    borderRadius: Radius.full,
     justifyContent: 'center',
     alignItems: 'center',
   },
   emoji: {
-    fontSize: 22,
+    fontSize: 20,
   },
   categoryPill: {
     borderRadius: Radius.full,
     paddingHorizontal: 11,
-    paddingVertical: 4,
-    borderWidth: 1,
+    paddingVertical: 5,
   },
   categoryText: {
     fontSize: 12,
-    fontWeight: '700',
-    letterSpacing: 0.2,
+    fontWeight: '600',
+    letterSpacing: 0.1,
   },
   arrowWrap: {
     width: 28,
     height: 28,
-    borderRadius: Radius.full,
     justifyContent: 'center',
     alignItems: 'center',
   },
   arrowIcon: {
-    fontSize: 22,
-    fontWeight: '700',
-    lineHeight: 26,
+    fontSize: 18,
+    fontWeight: '500',
   },
   title: {
     ...Typography.h3,
     color: Colors.textPrimary,
     marginBottom: Spacing.sm,
+    lineHeight: 22,
   },
   summary: {
     ...Typography.bodySm,
     color: Colors.textMuted,
     marginBottom: Spacing.lg,
+    lineHeight: 21,
   },
   footer: {
     flexDirection: 'row',
@@ -152,8 +157,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: Spacing.md,
     borderTopWidth: 1,
-    borderTopColor: Colors.borderMuted,
-    marginBottom: Spacing.md,
+    borderTopColor: Colors.borderLight,
+    marginBottom: Spacing.sm,
   },
   author: {
     ...Typography.labelMd,
@@ -182,24 +187,20 @@ const styles = StyleSheet.create({
   },
   seriesTag: {
     backgroundColor: '#EEF2FF',
-    borderRadius: Radius.sm,
-    paddingHorizontal: Spacing.sm,
-    paddingVertical: 3,
-    borderWidth: 1,
-    borderColor: '#C7D2FE',
+    borderRadius: Radius.full,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: 4,
   },
   seriesTagText: {
     fontSize: 11,
     color: '#4338CA',
-    fontWeight: '700',
+    fontWeight: '600',
   },
   tag: {
     backgroundColor: Colors.surfaceDim,
-    borderRadius: Radius.sm,
-    paddingHorizontal: Spacing.sm,
-    paddingVertical: 3,
-    borderWidth: 1,
-    borderColor: Colors.borderMuted,
+    borderRadius: Radius.full,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: 4,
   },
   tagText: {
     fontSize: 11,
