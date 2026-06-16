@@ -155,4 +155,5 @@ export const GradientPresets = {
   brandHorizontal: ['#5B5BD6', '#7C3AED'] as string[],
   brandSoft: ['#EEF2FF', '#F5F3FF', '#FFFFFF'] as string[],
   heroCard: ['#F8F7FF', '#FFFFFF'] as string[],
-  overlay: ['rgb
+  overlay: ['rgba(0,0,0,0)', 'rgba(0,0,0,0.4)'] as string[],
+} as const;

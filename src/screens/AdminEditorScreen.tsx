@@ -779,4 +779,16 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: 14,
   },
-  ghostBut
+  ghostButton: {
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.35)',
+    borderRadius: Radius.lg,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: 13,
+  },
+  ghostButtonText: {
+    color: Colors.textOnPrimary,
+    fontWeight: '700',
+    fontSize: 14,
+  },
+});

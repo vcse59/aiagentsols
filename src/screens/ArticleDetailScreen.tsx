@@ -473,4 +473,285 @@ const styles = StyleSheet.create({
   authorInitial: { fontSize: 22, fontWeight: '900' },
   authorInfo: { flex: 1 },
   authorName: { fontSize: 15, fontWeight: '700', color: Colors.textPrimary, marginBottom: 2 },
-  article
+  articleMeta: { fontSize: 13, color: Colors.textFaint },
+
+  // Tags
+  tagsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: Spacing.xs,
+    marginBottom: Spacing.lg,
+  },
+  tag: {
+    backgroundColor: Colors.surfaceDim,
+    borderRadius: Radius.full,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: 4,
+  },
+  tagText: { fontSize: 12, color: Colors.textMuted, fontWeight: '500' },
+
+  // Canonical link
+  canonicalLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.infoBg,
+    borderRadius: Radius.lg,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: 11,
+  },
+  canonicalLinkText: { color: Colors.info, fontSize: 13, fontWeight: '600' },
+
+  // ── Content divider ──────────────────────────────────────────────────────
+  contentDivider: {
+    paddingHorizontal: Spacing.xl,
+    marginBottom: Spacing['2xl'],
+  },
+  contentDividerLine: {
+    height: 3,
+    borderRadius: Radius.full,
+    width: 48,
+  },
+
+  // ── Content container ─────────────────────────────────────────────────────
+  contentContainer: {
+    paddingHorizontal: Spacing.xl,
+    paddingBottom: Spacing.xl,
+  },
+
+  // ── Heading styles ────────────────────────────────────────────────────────
+  heading1: {
+    fontSize: 28,
+    fontWeight: '900',
+    color: Colors.textPrimary,
+    marginTop: 40,
+    marginBottom: Spacing.md,
+    letterSpacing: -0.6,
+    lineHeight: 36,
+  },
+  heading2Wrap: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginTop: 36,
+    marginBottom: Spacing.md,
+    gap: Spacing.sm,
+  },
+  heading2Accent: {
+    width: 5,
+    borderRadius: Radius.full,
+    marginTop: 3,
+    height: 26,
+  },
+  heading2: {
+    flex: 1,
+    fontSize: 23,
+    fontWeight: '800',
+    color: Colors.textPrimary,
+    letterSpacing: -0.4,
+    lineHeight: 30,
+  },
+  heading3: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: Colors.textSecondary,
+    marginTop: Spacing['2xl'],
+    marginBottom: Spacing.sm,
+    lineHeight: 25,
+  },
+  heading4: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: Colors.textMuted,
+    marginTop: Spacing.xl,
+    marginBottom: Spacing.xs,
+  },
+
+  // ── Body text ─────────────────────────────────────────────────────────────
+  paragraph: {
+    fontSize: 16,
+    color: '#334155',
+    lineHeight: 27,
+    marginBottom: 14,
+  },
+  spacer: { height: 10 },
+
+  // ── Inline styles ─────────────────────────────────────────────────────────
+  bold: { fontWeight: '700', color: '#1e293b' },
+  italic: { fontStyle: 'italic', color: '#475569' },
+  inlineCode: {
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+    fontSize: 13,
+    backgroundColor: '#F1F5F9',
+    color: '#B91C1C',
+    paddingHorizontal: 5,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  link: {
+    color: Colors.primary,
+    textDecorationLine: 'underline',
+    fontWeight: '500',
+  },
+
+  // ── Bullet / numbered lists ───────────────────────────────────────────────
+  bulletRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 10,
+    paddingLeft: 4,
+  },
+  bulletDot: {
+    width: 7,
+    height: 7,
+    borderRadius: Radius.full,
+    marginTop: 9,
+    marginRight: 12,
+    flexShrink: 0,
+  },
+  bulletNum: {
+    fontSize: 15,
+    fontWeight: '700',
+    marginRight: 10,
+    marginTop: 1,
+    minWidth: 22,
+    textAlign: 'right',
+    flexShrink: 0,
+  },
+  bulletText: {
+    flex: 1,
+    fontSize: 16,
+    color: '#334155',
+    lineHeight: 26,
+  },
+  checkboxIcon: {
+    fontSize: 16,
+    marginRight: Spacing.sm,
+    marginTop: 2,
+    width: 22,
+    flexShrink: 0,
+  },
+  checkedText: {
+    textDecorationLine: 'line-through',
+    color: Colors.textFaint,
+  },
+
+  // ── Blockquote ────────────────────────────────────────────────────────────
+  blockquote: {
+    borderLeftWidth: 4,
+    borderRadius: 2,
+    paddingLeft: Spacing.lg,
+    paddingVertical: Spacing.sm,
+    marginVertical: Spacing.md,
+    backgroundColor: Colors.surfaceDim,
+    borderRadius: Radius.sm,
+  },
+  blockquoteText: {
+    fontSize: 16,
+    color: Colors.textMuted,
+    fontStyle: 'italic',
+    lineHeight: 26,
+  },
+
+  // ── Code block ───────────────────────────────────────────────────────────
+  codeBlockWrapper: {
+    marginVertical: Spacing.lg,
+    borderRadius: Radius.lg,
+    overflow: 'hidden',
+    backgroundColor: '#1E293B',
+  },
+  codeBlockHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: 10,
+    backgroundColor: '#0F172A',
+  },
+  codeBlockDots: {
+    flexDirection: 'row',
+    gap: 6,
+  },
+  dot: {
+    width: 10,
+    height: 10,
+    borderRadius: Radius.full,
+  },
+  codeBlockLang: {
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+    fontSize: 11,
+    color: '#94A3B8',
+    fontWeight: '600',
+    letterSpacing: 0.5,
+    textTransform: 'lowercase',
+  },
+  codeBlock: {
+    padding: Spacing.lg,
+    minWidth: '100%',
+  },
+  codeText: {
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+    fontSize: 13,
+    color: '#E2E8F0',
+    lineHeight: 22,
+  },
+
+  // ── Table ─────────────────────────────────────────────────────────────────
+  tableRow: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.borderMuted,
+    paddingVertical: Spacing.sm,
+  },
+  tableHeaderRow: { backgroundColor: Colors.surfaceDim },
+  tableCell: { flex: 1, fontSize: 13, color: Colors.textSecondary, paddingHorizontal: 4 },
+  tableHeaderCell: { fontWeight: '700', color: Colors.textPrimary },
+
+  // ── Horizontal rule ───────────────────────────────────────────────────────
+  horizontalRule: {
+    height: 1,
+    backgroundColor: Colors.borderLight,
+    marginVertical: Spacing.xl,
+  },
+
+  // ── Footer ───────────────────────────────────────────────────────────────
+  articleFooter: {
+    marginTop: Spacing['3xl'],
+    marginHorizontal: Spacing.xl,
+    marginBottom: Spacing['2xl'],
+    padding: Spacing['2xl'],
+    backgroundColor: Colors.surfaceDim,
+    borderRadius: Radius['2xl'],
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: Colors.borderLight,
+  },
+  footerAvatar: {
+    width: 56,
+    height: 56,
+    borderRadius: Radius.full,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: Spacing.md,
+  },
+  footerAvatarText: { fontSize: 24, fontWeight: '800' },
+  footerAuthorName: {
+    ...Typography.h3,
+    color: Colors.textPrimary,
+    marginBottom: 4,
+  },
+  footerRole: {
+    ...Typography.bodyXs,
+    color: Colors.textFaint,
+    marginBottom: Spacing.xl,
+  },
+  backToListButton: {
+    borderRadius: Radius.full,
+    paddingHorizontal: Spacing['2xl'],
+    paddingVertical: 12,
+    borderWidth: 1.5,
+  },
+  backToListText: {
+    fontSize: 14,
+    fontWeight: '700',
+    letterSpacing: 0.2,
+  },
+});

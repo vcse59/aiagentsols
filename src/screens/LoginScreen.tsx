@@ -330,4 +330,13 @@ const styles = StyleSheet.create({
   backLinkText: {
     color: Colors.primary,
     fontSize: 14,
-    fontWeight: '80
+    fontWeight: '800',
+  },
+  footer: {
+    textAlign: 'center',
+    color: 'rgba(255,255,255,0.55)',
+    fontSize: 12,
+    marginTop: Spacing['3xl'],
+    letterSpacing: 0.2,
+  },
+});
