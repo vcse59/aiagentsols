@@ -29,6 +29,7 @@ const {
 } = require('./articleStore');
 
 const app = express();
+app.set('trust proxy', 1);
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
@@ -372,6 +373,4 @@ async function startServer() {
 }
 
 startServer().catch((error) => {
-  console.error('Server startup failed:', error.message);
-  process.exit(1);
-});
+  console.error('Server startup failed:', error.message)
