@@ -492,8 +492,10 @@ export default function AdminEditorScreen({ navigation }: Props) {
             <TouchableOpacity style={styles.primaryButton} onPress={() => saveArticle('draft')} disabled={isLoading}>
               <Text style={styles.primaryButtonText}>{isLoading ? 'Saving...' : 'Save Draft'}</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.primaryButtonDark} onPress={() => saveArticle('published')} disabled={isLoading}>
-              <Text style={styles.primaryButtonText}>Publish Article</Text>
+            <TouchableOpacity style={styles.publishButtonWrapper} onPress={() => saveArticle('published')} disabled={isLoading} activeOpacity={0.88}>
+              <LinearGradient colors={['#5B5BD6', '#7C3AED']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.publishButtonGradient}>
+                <Text style={styles.primaryButtonText}>🚀 Publish Article</Text>
+              </LinearGradient>
             </TouchableOpacity>
             {selectedArticleId ? (
               <TouchableOpacity style={styles.destructiveButton} onPress={confirmDeleteArticle} disabled={isDeleting}>
@@ -525,25 +527,28 @@ const styles = StyleSheet.create({
   },
   hero: {
     borderRadius: Radius['2xl'],
-    padding: Spacing['2xl'],
+    padding: Spacing['3xl'],
+    ...Shadow.lg,
   },
   heroEyebrow: {
-    color: 'rgba(255,255,255,0.7)',
+    color: 'rgba(255,255,255,0.75)',
     fontSize: 11,
-    fontWeight: '700',
+    fontWeight: '800',
     textTransform: 'uppercase',
-    letterSpacing: 2,
-    marginBottom: Spacing.sm,
+    letterSpacing: 2.5,
+    marginBottom: Spacing.md,
   },
   heroTitle: {
-    ...Typography.displayMd,
+    ...Typography.displayLg,
     color: Colors.textOnPrimary,
-    marginBottom: Spacing.sm,
+    marginBottom: Spacing.md,
+    letterSpacing: -0.8,
+    lineHeight: 40,
   },
   heroSubtitle: {
-    ...Typography.bodySm,
-    color: 'rgba(255,255,255,0.8)',
-    lineHeight: 22,
+    ...Typography.bodyMd,
+    color: 'rgba(255,255,255,0.82)',
+    lineHeight: 24,
   },
   heroActions: {
     flexDirection: 'row',
@@ -557,7 +562,7 @@ const styles = StyleSheet.create({
     padding: Spacing.xl,
     borderWidth: 1,
     borderColor: Colors.borderLight,
-    ...Shadow.sm,
+    ...Shadow.md,
   },
   panelHeader: {
     flexDirection: 'row',
@@ -566,8 +571,10 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.lg,
   },
   panelTitle: {
-    ...Typography.h2,
+    fontSize: 22,
+    fontWeight: '800',
     color: Colors.textPrimary,
+    letterSpacing: -0.3,
   },
   linkButton: {
     paddingHorizontal: Spacing.lg,
@@ -701,15 +708,13 @@ const styles = StyleSheet.create({
   },
   categoryChip: {
     borderRadius: Radius.full,
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.sm,
-    borderWidth: 1.5,
-    borderColor: Colors.borderDefault,
-    backgroundColor: Colors.surfaceElevated,
+    paddingHorizontal: Spacing.xl,
+    paddingVertical: 10,
+    backgroundColor: Colors.surfaceDim,
   },
   categoryChipActive: {
     backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
+    ...Shadow.sm,
   },
   categoryChipText: {
     color: Colors.primary,
@@ -729,19 +734,22 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
     borderRadius: Radius.lg,
     paddingHorizontal: Spacing.lg,
-    paddingVertical: 13,
+    paddingVertical: 14,
     ...Shadow.md,
   },
-  primaryButtonDark: {
-    backgroundColor: Colors.primaryDark,
+  publishButtonWrapper: {
     borderRadius: Radius.lg,
+    overflow: 'hidden',
+    ...Shadow.lg,
+  },
+  publishButtonGradient: {
     paddingHorizontal: Spacing.lg,
-    paddingVertical: 13,
-    ...Shadow.md,
+    paddingVertical: 14,
+    alignItems: 'center',
   },
   primaryButtonText: {
     color: Colors.textOnPrimary,
-    fontWeight: '700',
+    fontWeight: '800',
     fontSize: 14,
     letterSpacing: 0.2,
   },
@@ -771,16 +779,4 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: 14,
   },
-  ghostButton: {
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.35)',
-    borderRadius: Radius.lg,
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: 13,
-  },
-  ghostButtonText: {
-    color: Colors.textOnPrimary,
-    fontWeight: '700',
-    fontSize: 14,
-  },
-});
+  ghostBut

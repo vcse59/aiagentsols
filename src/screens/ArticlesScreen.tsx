@@ -259,8 +259,8 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: Spacing.xl,
-    paddingTop: Spacing.lg,
-    paddingBottom: Spacing.xl,
+    paddingTop: Spacing.xl,
+    paddingBottom: Spacing['2xl'],
   },
   headerTop: {
     flexDirection: 'row',
@@ -278,25 +278,26 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.sm,
   },
   brandIconWrap: {
-    width: 28,
-    height: 28,
-    borderRadius: Radius.sm,
+    width: 32,
+    height: 32,
+    borderRadius: Radius.md,
     backgroundColor: Colors.overlayMedium,
     justifyContent: 'center',
     alignItems: 'center',
   },
   brandIcon: {
-    fontSize: 16,
+    fontSize: 18,
   },
   brandName: {
-    ...Typography.labelMd,
-    color: 'rgba(255,255,255,0.9)',
-    letterSpacing: 0.2,
+    ...Typography.labelLg,
+    color: 'rgba(255,255,255,0.95)',
+    letterSpacing: 0.3,
   },
   headerTitle: {
-    ...Typography.displayMd,
+    ...Typography.displayLg,
     color: Colors.textOnPrimary,
-    lineHeight: 34,
+    lineHeight: 42,
+    letterSpacing: -1,
   },
   headerActions: {
     flexDirection: 'column',
@@ -304,30 +305,30 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   manageButton: {
-    backgroundColor: Colors.overlayMedium,
+    backgroundColor: 'rgba(255,255,255,0.25)',
     borderRadius: Radius.full,
     paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.sm,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.3)',
+    paddingVertical: 10,
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.4)',
   },
   manageButtonText: {
     color: Colors.textOnPrimary,
     fontSize: 13,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   signOutButton: {
     backgroundColor: Colors.overlayDark,
     borderRadius: Radius.full,
     paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.sm,
+    paddingVertical: 10,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.18)',
+    borderColor: 'rgba(255,255,255,0.2)',
   },
   signOutText: {
     color: 'rgba(255,255,255,0.9)',
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   adminBadge: {
     marginTop: Spacing.md,
@@ -404,17 +405,18 @@ const styles = StyleSheet.create({
     paddingBottom: Spacing.xs,
   },
   categoryChip: {
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: 8,
+    paddingHorizontal: Spacing.xl,
+    paddingVertical: 10,
     borderRadius: Radius.full,
     backgroundColor: Colors.surfaceDim,
   },
   categoryChipActive: {
     backgroundColor: Colors.primary,
+    ...Shadow.sm,
   },
   categoryChipText: {
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: '700',
     color: Colors.textMuted,
   },
   categoryChipTextActive: {
@@ -435,48 +437,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.sm,
     paddingHorizontal: Spacing.sm,
-    paddingBottom: Spacing.sm,
-  },
-  loadingText: {
-    ...Typography.labelMd,
-    color: Colors.textMuted,
-  },
-  listContent: {
-    paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.sm,
-    paddingBottom: 48,
-  },
-  emptyState: {
-    alignItems: 'center',
-    paddingTop: 64,
-    paddingHorizontal: 40,
-  },
-  emptyEmoji: {
-    fontSize: 52,
-    marginBottom: Spacing.lg,
-  },
-  emptyTitle: {
-    ...Typography.h2,
-    color: Colors.textPrimary,
-    marginBottom: Spacing.sm,
-    textAlign: 'center',
-  },
-  emptySubtitle: {
-    ...Typography.bodySm,
-    color: Colors.textFaint,
-    textAlign: 'center',
-    lineHeight: 20,
-    marginBottom: Spacing.xl,
-  },
-  clearSearchBtn: {
-    backgroundColor: Colors.primary,
-    borderRadius: Radius.full,
-    paddingHorizontal: Spacing.xl,
-    paddingVertical: 10,
-  },
-  clearSearchBtnText: {
-    color: Colors.textOnPrimary,
-    fontSize: 13,
-    fontWeight: '700',
-  },
-});
+    paddingBottom: 

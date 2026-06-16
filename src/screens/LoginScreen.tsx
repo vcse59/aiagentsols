@@ -136,16 +136,23 @@ export default function LoginScreen({ navigation }: Props) {
 
           {/* Sign In Button */}
           <TouchableOpacity
-            style={[styles.signInButton, isLoading && styles.signInButtonDisabled]}
+            style={[styles.signInButtonWrapper, isLoading && styles.signInButtonDisabled]}
             onPress={handleSignIn}
             disabled={isLoading || !isConfigured}
-            activeOpacity={0.85}
+            activeOpacity={0.88}
           >
-            {isLoading ? (
-              <ActivityIndicator color="#FFFFFF" size="small" />
-            ) : (
-              <Text style={styles.signInButtonText}>Continue to Admin</Text>
-            )}
+            <LinearGradient
+              colors={['#5B5BD6', '#7C3AED']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.signInButtonGradient}
+            >
+              {isLoading ? (
+                <ActivityIndicator color="#FFFFFF" size="small" />
+              ) : (
+                <Text style={styles.signInButtonText}>Continue to Admin →</Text>
+              )}
+            </LinearGradient>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -183,30 +190,32 @@ const styles = StyleSheet.create({
     marginBottom: Spacing['3xl'],
   },
   logoContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: Colors.overlayLight,
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    backgroundColor: 'rgba(255,255,255,0.2)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: Spacing.md,
-    borderWidth: 1.5,
-    borderColor: 'rgba(255,255,255,0.4)',
+    marginBottom: Spacing.lg,
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.5)',
+    ...Shadow.lg,
   },
   logoIcon: {
-    fontSize: 36,
+    fontSize: 44,
   },
   appTitle: {
-    ...Typography.displayMd,
+    ...Typography.displayLg,
     color: Colors.textOnPrimary,
     textAlign: 'center',
+    letterSpacing: -0.5,
   },
   appSubtitle: {
-    ...Typography.bodySm,
-    color: 'rgba(255,255,255,0.78)',
+    ...Typography.bodyMd,
+    color: 'rgba(255,255,255,0.82)',
     marginTop: Spacing.sm,
     textAlign: 'center',
-    letterSpacing: 0.3,
+    letterSpacing: 0.2,
   },
   card: {
     backgroundColor: Colors.surface,
@@ -217,15 +226,17 @@ const styles = StyleSheet.create({
     ...Shadow.xl,
   },
   cardTitle: {
-    ...Typography.h1,
+    fontSize: 26,
+    fontWeight: '800',
     color: Colors.textPrimary,
     marginBottom: Spacing.sm,
+    letterSpacing: -0.4,
   },
   cardSubtitle: {
     ...Typography.bodySm,
     color: Colors.textMuted,
     marginBottom: Spacing['2xl'],
-    lineHeight: 20,
+    lineHeight: 21,
   },
   infoContainer: {
     backgroundColor: Colors.infoBg,
@@ -292,22 +303,24 @@ const styles = StyleSheet.create({
   eyeIcon: {
     fontSize: 18,
   },
-  signInButton: {
-    backgroundColor: Colors.primary,
+  signInButtonWrapper: {
     borderRadius: Radius.xl,
-    paddingVertical: 15,
-    alignItems: 'center',
     marginTop: Spacing.sm,
-    ...Shadow.md,
+    overflow: 'hidden',
+    ...Shadow.lg,
+  },
+  signInButtonGradient: {
+    paddingVertical: 17,
+    alignItems: 'center',
   },
   signInButtonDisabled: {
-    opacity: 0.6,
+    opacity: 0.55,
   },
   signInButtonText: {
     color: Colors.textOnPrimary,
     fontSize: 16,
-    fontWeight: '700',
-    letterSpacing: 0.4,
+    fontWeight: '800',
+    letterSpacing: 0.3,
   },
   backLink: {
     marginTop: Spacing.lg,
@@ -317,13 +330,4 @@ const styles = StyleSheet.create({
   backLinkText: {
     color: Colors.primary,
     fontSize: 14,
-    fontWeight: '700',
-  },
-  footer: {
-    textAlign: 'center',
-    color: 'rgba(255,255,255,0.55)',
-    fontSize: 12,
-    marginTop: Spacing['3xl'],
-    letterSpacing: 0.2,
-  },
-});
+    fontWeight: '80
