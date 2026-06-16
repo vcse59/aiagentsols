@@ -637,12 +637,11 @@ const styles = StyleSheet.create({
   // ── Blockquote ────────────────────────────────────────────────────────────
   blockquote: {
     borderLeftWidth: 4,
-    borderRadius: 2,
+    borderRadius: Radius.sm,
     paddingLeft: Spacing.lg,
     paddingVertical: Spacing.sm,
     marginVertical: Spacing.md,
     backgroundColor: Colors.surfaceDim,
-    borderRadius: Radius.sm,
   },
   blockquoteText: {
     fontSize: 16,
