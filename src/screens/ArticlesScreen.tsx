@@ -217,19 +217,34 @@ export default function ArticlesScreen({ navigation }: Props) {
         ListHeaderComponent={
           isLoadingManaged && !isInitializing ? (
             <View style={styles.loadingRow}>
-              <ActivityIndicator color="#0F766E" />
-              <Text style={styles.loadingText}>Loading published admin articles...</Text>
+              <ActivityIndicator color={Colors.primary} size="small" />
+              <Text style={styles.loadingText}>Fetching latest articles…</Text>
             </View>
           ) : null
         }
         ListEmptyComponent={
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyEmoji}>🔍</Text>
-            <Text style={styles.emptyTitle}>No articles found</Text>
-            <Text style={styles.emptySubtitle}>
-              Try adjusting your search or selecting a different category.
-            </Text>
-          </View>
+          !isLoadingManaged ? (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyEmoji}>{searchQuery ? '🔍' : '📭'}</Text>
+              <Text style={styles.emptyTitle}>
+                {searchQuery ? 'No results found' : 'No articles yet'}
+              </Text>
+              <Text style={styles.emptySubtitle}>
+                {searchQuery
+                  ? `Nothing matched "${searchQuery}". Try a different search or category.`
+                  : 'Check back soon — articles will appear here once published.'}
+              </Text>
+              {searchQuery ? (
+                <TouchableOpacity
+                  style={styles.clearSearchBtn}
+                  onPress={() => { setSearchQuery(''); setSelectedCategory('All'); }}
+                  activeOpacity={0.8}
+                >
+                  <Text style={styles.clearSearchBtnText}>Clear search</Text>
+                </TouchableOpacity>
+              ) : null}
+            </View>
+          ) : null
         }
       />
     </SafeAreaView>
@@ -244,8 +259,8 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: Spacing.xl,
-    paddingTop: Spacing.xl,
-    paddingBottom: Spacing['2xl'],
+    paddingTop: Spacing.lg,
+    paddingBottom: Spacing.xl,
   },
   headerTop: {
     flexDirection: 'row',
@@ -349,12 +364,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: Colors.surface,
-    borderRadius: Radius.xl,
+    borderRadius: Radius.lg,
     paddingHorizontal: Spacing.lg,
-    paddingVertical: Platform.OS === 'ios' ? 13 : 8,
-    ...Shadow.sm,
-    borderWidth: 1.5,
-    borderColor: Colors.borderDefault,
+    paddingVertical: Platform.OS === 'ios' ? 12 : 8,
+    ...Shadow.xs,
+    borderWidth: 1,
+    borderColor: Colors.borderLight,
   },
   searchIcon: {
     fontSize: 16,
@@ -392,32 +407,28 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.lg,
     paddingVertical: 8,
     borderRadius: Radius.full,
-    backgroundColor: Colors.surface,
-    borderWidth: 1.5,
-    borderColor: Colors.borderDefault,
-    ...Shadow.xs,
+    backgroundColor: Colors.surfaceDim,
   },
   categoryChipActive: {
     backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
-    ...Shadow.sm,
   },
   categoryChipText: {
     fontSize: 13,
     fontWeight: '600',
-    color: Colors.primary,
+    color: Colors.textMuted,
   },
   categoryChipTextActive: {
     color: Colors.textOnPrimary,
   },
   resultBar: {
     paddingHorizontal: Spacing.xl,
-    paddingTop: Spacing.md,
+    paddingTop: Spacing.sm,
     paddingBottom: Spacing.xs,
   },
   resultText: {
-    ...Typography.labelMd,
-    color: Colors.textMuted,
+    ...Typography.labelSm,
+    color: Colors.textFaint,
+    letterSpacing: 0.1,
   },
   loadingRow: {
     flexDirection: 'row',
@@ -427,32 +438,4 @@ const styles = StyleSheet.create({
     paddingBottom: Spacing.sm,
   },
   loadingText: {
-    ...Typography.labelMd,
-    color: Colors.textMuted,
-  },
-  listContent: {
-    paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.sm,
-    paddingBottom: 48,
-  },
-  emptyState: {
-    alignItems: 'center',
-    paddingTop: 72,
-    paddingHorizontal: 36,
-  },
-  emptyEmoji: {
-    fontSize: 56,
-    marginBottom: Spacing.lg,
-  },
-  emptyTitle: {
-    ...Typography.h2,
-    color: Colors.textPrimary,
-    marginBottom: Spacing.sm,
-    textAlign: 'center',
-  },
-  emptySubtitle: {
-    ...Typography.bodySm,
-    color: Colors.textFaint,
-    textAlign: 'center',
-  },
-});
+ 
