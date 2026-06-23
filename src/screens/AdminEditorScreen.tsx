@@ -198,6 +198,8 @@ export default function AdminEditorScreen({ navigation }: Props) {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('status', status);
+      formData.append('title', form.title.trim());
+      formData.append('summary', form.summary.trim());
       formData.append('author', form.author.trim() || 'Admin');
       formData.append('category', form.category);
       formData.append('emoji', form.emoji.trim() || '📝');
